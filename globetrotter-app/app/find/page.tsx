@@ -5,14 +5,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { useRecordVoice } from "@/hooks/recordVoice";
 import { useState } from "react";
+import { text } from "stream/consumers";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
   const { startRecording, stopRecording, text } = useRecordVoice();
+  const [responseText, setResponseText] = useState<string>("");
+  const [responseDetails, setResponseDetails] = useState<any>({});
+  
 
+
+  // debug text
   const dummytext = 'Hi, my name is T, I am looking to travel to Japan. What kind of food can I eat?'
-  // const [text, setText] = useState("");
+
+  const pythonDebug = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/travel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_input: dummytext,
+        }),
+      });
+      const data = await response.json();
+      console.log("data", data);
+      console.log("response", data.response.responseText);
+      console.log("responseText", data.responseText);
+      console.log("details", data.details);
+      setResponseText(data.response)
+    } catch (error) {
+      console.error('Error sending request to Python backend:', error);
+    }
+  }
 
   const handleClick = async (base64data: any) => {
     // try {
@@ -56,6 +83,9 @@ export default function FindPage() {
 
   
 
+
+
+
   return (
     <div className="container mx-auto p-4">
       <Card>
@@ -69,9 +99,16 @@ export default function FindPage() {
         </CardContent>
       </Card>
           
-       <div className="w-full">
+       <div className="w-full h-max flex flex-col gap-2">
           <Input value={dummytext}/>
-        </div>   
+          <button onClick={pythonDebug}>Submit</button>
+      </div> 
+
+      <div>
+        <p>{}</p>
+        <div></div>
+        <p>{}</p>  
+      </div>  
     </div>
   )
 }
