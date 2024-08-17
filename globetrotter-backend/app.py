@@ -35,7 +35,7 @@ def plan_trip():
     end_date = data.get('end_date')
     budget = data.get('budget')
     max_distance = data.get('max_distance')
-    user_comments = data.get('comments', '')  # Optional user comments
+    user_comments = data.get('comments', '')  
 
     prompt = f"""
     You are a travel assistant. Generate a comprehensive travel plan for a trip to {city} from {start_date} to {end_date}.
