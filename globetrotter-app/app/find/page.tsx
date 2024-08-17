@@ -12,7 +12,7 @@ export default function FindPage() {
   const [transcript, setTranscript] = useState("");
   const { startRecording, stopRecording, text } = useRecordVoice();
   const [responseText, setResponseText] = useState<string>("");
-  const [responseDetails, setResponseDetails] = useState<any>({});
+  const [responseDetails, setResponseDetails] = useState<Array<{parameter: string; value: string}>>([]);
   
 
 
@@ -32,10 +32,10 @@ export default function FindPage() {
       });
       const data = await response.json();
       console.log("data", data);
-      console.log("response", data.response.responseText);
       console.log("responseText", data.responseText);
       console.log("details", data.details);
-      setResponseText(data.response)
+      setResponseText(data.responseText)
+      setResponseDetails(data.details)
     } catch (error) {
       console.error('Error sending request to Python backend:', error);
     }
@@ -105,9 +105,11 @@ export default function FindPage() {
       </div> 
 
       <div>
-        <p>{}</p>
+        <p>{responseText}</p>
         <div></div>
-        <p>{}</p>  
+        {responseDetails.map((detail, index) => (
+          <p key={index}>{detail.parameter}: {detail.value}</p>
+        ))}  
       </div>  
     </div>
   )
