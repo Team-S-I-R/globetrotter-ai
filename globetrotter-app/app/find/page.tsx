@@ -9,8 +9,9 @@ import Header from "../gt-components/header";
 import { motion } from "framer-motion";
 import staticgif from '../assets/static.gif'
 import axios from 'axios';
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useLoader } from '@react-three/fiber';
 import PlaneModel from "../gt-components/3dstuff/plane";
+import { useToast } from "@/components/ui/use-toast";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 
 
@@ -22,6 +23,7 @@ export default function FindPage() {
   const [conversationText, setConversationText] = useState("");
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([]);
   // const [text, setText] = useState("");
+  const { toast } = useToast()
   const dummytext = "Hi my name is T, I am looking to go to depart from Atlanta soon to Arrive in Japan and I don't know what food to eat.";
   // const dummytext = "So im looking to travel from January the first of 2025 to january the 7th of 2025. I want to go with my mother.";
   // const dummytext = "I would actually be more interested in Tokyo or Kyoto!"
@@ -61,6 +63,14 @@ export default function FindPage() {
   // fetchTravelData();
 
   const pythonMessage = async () => {
+    stopRecording();
+    
+    if (text === "") {
+      console.error("No text provided for processing.");
+      toast({ title: '❌ Error, Please Try Again!', description: 'Please press the start button to start a conversation.', itemID: 'error' });
+      return;
+    }
+
     try {
       const response = await fetch(`http://127.0.0.1:5000/travel`, {
         method: "POST",
@@ -68,7 +78,7 @@ export default function FindPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_input: dummytext
+          user_input: text
         }),
       });
 
@@ -120,7 +130,7 @@ export default function FindPage() {
           {/* <div className="w-full h-full absolute bg-black opacity-70 top-0 left-0 z-[-1]"></div> */}
         </div>
 
-        <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-0 left-0 w-full h-full z-[-1]">
             <PlaneModel />
         </div>
 
@@ -144,9 +154,9 @@ export default function FindPage() {
                 </>
               )}
 
-              <Button className="hover:scale-[110%]" onClick={stopRecording}>Stop!</Button>
+              <Button className="hover:scale-[110%]" onClick={pythonMessage}>Stop!</Button>
 
-              <Button onClick={pythonMessage}>test</Button>
+              {/* <Button onClick={pythonMessage}>test</Button> */}
               {/* {audio && <audio src={audio} controls />} */}
             </CardContent>
           </Card>
