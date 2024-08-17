@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Hero from "./gt-components/hero";
+import ParticleRing from "./gt-components/3dparticles";
 
 export default function Home() {
   return (
-    <main>
-      <div className="w-screen h-screen flex place-items-center place-content-center">
+    <main className="w-screen h-screen overflow-y-scroll">
+      <div className="w-full h-full flex place-items-center place-content-center">
         <Hero />
       </div>
     </main>

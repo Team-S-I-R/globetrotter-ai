@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { submitFormResponse } from '../actions'
 import { useFormState, useFormStatus } from 'react-dom'
 import { useToast } from "@/components/ui/use-toast"
-
+import ParticleRing from './3dparticles'
 
 export default function Hero() {
 
@@ -40,7 +40,6 @@ export default function Hero() {
         message: string;
     };
     
-    
     const formAction = async (prevState: FormState, formData: FormData): Promise<FormState> => {
         await submitFormResponse(formData, formState);
         console.log('Form submitted successfully!');
@@ -54,17 +53,22 @@ export default function Hero() {
 
     return (
         <>
-        <div className="flex flex-col gap-4 w-max">
-          <h1 className="text-6xl">Globetrotter AI</h1>
-          <div className="w-full flex flex-col gap-2 place-items-center">
+        <div className="flex flex-col gap-4 w-full h-full place-items-center place-content-center">
+
+    
+            <h1 className="text-6xl">Globetrotter AI</h1>
+          <div className="w-1/2  flex flex-col gap-2 place-items-center">
             <p>Join the wait list</p>
             <form action={action} className=' w-full flex flex-col gap-2'>
-                <Input type='email' name='Email' autoFocus placeholder="Email" />
+                <Input  type='email' name='Email' autoFocus placeholder="Email" />
                 <Input type='text' name='Name' placeholder="Name" />
                 <SubmitButton />
             </form> 
           </div>
         </div>
+
+        <div className='w-full h-full bg-gradient-to-b from-white via-white to-transparent top-0 left-0 absolute z-[-9]'></div>
+        {/* <img className='w-full h-full absolute z-[-10]' src={sky.src} alt="" />      */}
         </>
     )
 }

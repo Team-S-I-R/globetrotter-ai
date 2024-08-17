@@ -10,20 +10,25 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.18.0",
-    "@radix-ui/react-toast": "^1.2.1",
+    "@google-cloud/speech": "^6.7.0",
+    "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "framer-motion": "^11.3.28",
+    "dotenv": "^16.4.5",
+    "fs": "^0.0.1-security",
     "lucide-react": "^0.428.0",
+    "net": "^1.0.2",
     "next": "14.2.5",
+    "node-record-lpcm16": "^1.0.1",
     "react": "^18",
     "react-dom": "^18",
+    "shadcn-ui": "^0.2.3",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.23.8"
+    "tls": "^0.0.1"
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.19",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
