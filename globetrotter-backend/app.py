@@ -17,6 +17,8 @@ NEW_GOOGLE_API_KEY = "AIzaSyCmIRr2omcRRr_dbASqK4KjDNdatz4zGK8"
 genai.configure(api_key=NEW_GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+
+
 def generate_content(prompt):
     try:
         response = model.generate_content(prompt)

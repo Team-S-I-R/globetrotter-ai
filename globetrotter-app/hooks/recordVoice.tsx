@@ -7,6 +7,7 @@ export const useRecordVoice = () => {
 
   // State to track whether recording is currently in progress
   const [recording, setRecording] = useState<boolean>(false);
+  const [recordingStart, setRecordingStart] = useState<boolean>(false);
   const isRecording = useRef<boolean>(false);
   // Ref to store audio chunks during recording
   const chunks = useRef<Blob[]>([]);

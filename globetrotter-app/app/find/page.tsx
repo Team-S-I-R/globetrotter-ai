@@ -10,7 +10,7 @@ import Header from "../gt-components/header";
 
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
-  const { startRecording, stopRecording, text } = useRecordVoice();
+  const { startRecording, stopRecording, text, recording } = useRecordVoice();
   const [audio, setAudio] = useState("");
   // const [text, setText] = useState("");
   const dummytext = "This is a test message";
@@ -43,23 +43,26 @@ export default function FindPage() {
       <div className="w-screen h-screen py-[80px]">
       <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
      
-          
-      <div className="w-full">
-          <Input value={dummytext}/>
-      </div>  
+     {/* beautiful content will go here */}
+      <div className="w-full h-max flex flex-col place-items-center place-content-center">
+         <p>{text}</p>
+      </div>
 
-      <Card className="w-full h-max flex flex-col place-items-center place-content-center">
+      <div className="w-full h-max flex flex-col place-items-center gap-2">
+      <Card className="w-full border-none outline-none h-max flex flex-col place-items-center place-content-center">
         <CardHeader>
-          <CardTitle>Transcripting</CardTitle>
+          {recording === true && <CardTitle>Recording</CardTitle>}
+          {recording === false && <CardTitle>Press Start</CardTitle>}
         </CardHeader>
         <CardContent className="flex gap-4">
-          <Button onClick={() => handleClick(text)}>translate!</Button>
+          {/* <Button onClick={() => handleClick(text)}>translate!</Button> */}
           <Button onClick={startRecording}>Start!</Button>
           <Button onClick={stopRecording}>Stop!</Button>
-          <p>{text}</p>
-          {audio && <audio src={audio} controls />}
+          {/* {audio && <audio src={audio} controls />} */}
         </CardContent>
       </Card>
+      <p>{text}</p>
+      </div>
 
     </div>
       
