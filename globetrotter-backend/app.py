@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 import google.generativeai as genai
+import google.logging as logging
 import json
 import os
 from flask_cors import CORS
@@ -19,11 +20,14 @@ NEW_GOOGLE_API_KEY = "AIzaSyCmIRr2omcRRr_dbASqK4KjDNdatz4zGK8"
 genai.configure(api_key=NEW_GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+chat = model.start_chat(
+    history=[]
+)
 
 
 def generate_content(prompt):
     try:
-        response = model.generate_content(prompt)
+        response = chat.send_message(prompt)
         response_text = response.text
         clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
         return clean_response_text
@@ -110,17 +114,23 @@ def generate_travel_guide():
                {"parameter":"numInfants", "value":"<value>"},
                {"parameter":"baggage", "value":"<value>"},
                {"parameter":"isOneWay", "value":"<true/false>"},
-               {"parameter":"classPreference", "value":"<value>"},
+               {"parameter":"budget", "value":"<value>"},
                {"parameter":"directOnly", "value":"<true/false>"}
            ]}
 
     prompt = f"""
     You are a travel booking assistant. The user provided the following information: "{user_input}".
-    Use data from the sentence to output in the following JSON format. do not include formatting or code blocks:
+    Use data from the sentence to output in the following JSON format. do not include formatting or code blocks.
+    The user will be speaking to you in a conversation. Please infer the user's intent from the context and fill out the values in the json object based on the user's intent.
+    If the user is talking about where they would like to travel to, please use the input to fill the 'arrival' parameter.
+    If the user is asking about the dates, please use the input to fill the 'start_date' and 'end_date' parameters.
+    If the user is asking about the number of people traveling, please use the input to fill the 'numAdults', 'numChildren', and 'numInfants' parameters.
+    Also, as you are having the conversation, If you update a value in the json object, please remember these values. Add them to your memory and send them
+    every time you send a response along with the new values you discover in the conversation.
     {json.dumps(obj)}
     """
     try:
-        response = model.generate_content(prompt)
+        response = chat.send_message(prompt)
         response_text = response.text
         print("PROMPT")
         print(prompt)

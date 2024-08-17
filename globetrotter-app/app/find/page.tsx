@@ -9,6 +9,8 @@ import Header from "../gt-components/header";
 import { motion } from "framer-motion";
 import staticgif from '../assets/static.gif'
 import axios from 'axios';
+import { Canvas } from "@react-three/fiber";
+import PlaneModel from "../gt-components/3dstuff/plane";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 
 
@@ -20,7 +22,9 @@ export default function FindPage() {
   const [conversationText, setConversationText] = useState("");
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([]);
   // const [text, setText] = useState("");
-  const dummytext = "Hi my name is T, I am looking to go to Japan soon and I don't know what food to eat. I am based in Atlanta, Ga if that metters.";
+  const dummytext = "Hi my name is T, I am looking to go to depart from Atlanta soon to Arrive in Japan and I don't know what food to eat.";
+  // const dummytext = "So im looking to travel from January the first of 2025 to january the 7th of 2025. I want to go with my mother.";
+  // const dummytext = "I would actually be more interested in Tokyo or Kyoto!"
 
   // this should make the ai talk and it should say the responsetext
   const handleClick = async (msg: String) => {
@@ -64,7 +68,7 @@ export default function FindPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: dummytext
+          user_input: dummytext
         }),
       });
 
@@ -87,27 +91,37 @@ export default function FindPage() {
     <div className="w-screen h-screen py-[80px]">
       
       <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
-     
+      
         {/* beautiful content will go here */}
-        <div className="w-full relative text-white h-[70%] flex flex-col place-items-center place-content-start py-8">
+        <div className="w-full relative overflow-hidden h-[70%] flex flex-col place-items-center place-content-start py-8">
+          
+          <div className="w-full h-full flex flex-col place-items-start no-scrollbar overflow-y-scroll">
           <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
           className="select-none w-[70%]">
             {conversationText}
           </motion.p>
-
-          {details?.map((detail, index) => (
-          <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
-          className="select-none w-[70%] p-2 bg-white text-black rounded-md"
-          >
-            <p key={index}>{detail.parameter}: {detail.value}</p>
-          </motion.div>
+          <div className="flex flex-col">
+            {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => (
+            <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
+            className="select-none w-max p-2 bg-white text-black"
+            >
+              <p className="select-none" key={index}><span className="font-bold">{detail.parameter}</span>: {detail.value}</p>
+            </motion.div>
             ))}
-          <img className="w-full h-full absolute opacity-80 top-0 left-0 z-[-1]" src={staticgif.src}></img>
-          <div className="w-full h-full absolute bg-black opacity-70 top-0 left-0 z-[-1]"></div>
+          </div>
+          </div>
+
+
+          {/* <img className="w-full h-full absolute opacity-80 top-0 left-0 z-[-1]" src={staticgif.src}></img> */}
+          {/* <div className="w-full h-full absolute bg-black opacity-70 top-0 left-0 z-[-1]"></div> */}
+        </div>
+
+        <div className="absolute top-0 left-0 w-full h-full">
+            <PlaneModel />
         </div>
 
         <div className="w-full h-max flex flex-col place-items-center gap-2">
