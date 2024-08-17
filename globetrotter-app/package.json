@@ -13,6 +13,7 @@
     "@google-cloud/speech": "^6.7.0",
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
