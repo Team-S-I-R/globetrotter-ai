@@ -35,6 +35,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+<<<<<<< HEAD
+globetrotter-key.json
+=======
 # next-video
 videos/*
 !videos/*.json
@@ -44,3 +47,4 @@ public/_next-video
 
 globetrotter-app/globetrotter-key.json
 
+>>>>>>> 80afc2d46c8cfbd2852e3c9b5d741412c1072a37

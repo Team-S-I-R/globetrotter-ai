@@ -4,6 +4,8 @@ import fs from "fs";
 // Imports the Google Cloud client library
 const speech = require("@google-cloud/speech");
 
+process.env.GOOGLE_APPLICATION_CREDENTIALS = "./globetrotter-key.json"
+
 // Creates a client
 const client = new speech.SpeechClient();
 
@@ -23,7 +25,7 @@ export async function POST(req: any) {
   fs.writeFileSync(filePath, audio);
 
   // Create a readable stream from the temporary WAV file
-  const readStream = fs.createReadStream(filePath);
+  // const readStream = fs.createReadStream(filePath);
 
   // The audio file's encoding, sample rate in hertz, and BCP-47 language code
   const aud = {

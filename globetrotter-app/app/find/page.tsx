@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useRecordVoice } from "@/hooks/recordVoice";
 import { useState } from "react";
 import { text } from "stream/consumers";
+import Header from "../gt-components/header";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 
 export default function FindPage() {
@@ -15,9 +16,8 @@ export default function FindPage() {
   const [responseDetails, setResponseDetails] = useState<Array<{parameter: string; value: string}>>([]);
   
 
-
   // debug text
-  const dummytext = 'Hi, my name is T, I am looking to travel to Japan. What kind of food can I eat?'
+  const [audio, setAudio] = useState("");
 
   const pythonDebug = async () => {
     try {
@@ -40,6 +40,7 @@ export default function FindPage() {
       console.error('Error sending request to Python backend:', error);
     }
   }
+  const dummytext = "This is a test message";
 
   const handleClick = async (base64data: any) => {
     // try {
@@ -87,15 +88,29 @@ export default function FindPage() {
 
 
   return (
-    <div className="container mx-auto p-4">
-      <Card>
+    <>
+    <div className="absolute top-0 left-0">
+        <Header/>  
+    </div>
+
+      <div className="w-screen h-screen py-[80px]">
+      <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
+     
+          
+      <div className="w-full">
+          <Input value={dummytext}/>
+      </div>  
+
+      <Card className="w-full h-max flex flex-col place-items-center place-content-center">
         <CardHeader>
           <CardTitle>Transcripting</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Button onClick={handleClick}>translate!</Button>
+        <CardContent className="flex gap-4">
+          <Button onClick={() => handleClick(text)}>translate!</Button>
           <Button onClick={startRecording}>Start!</Button>
           <Button onClick={stopRecording}>Stop!</Button>
+          <p>{text}</p>
+          {audio && <audio src={audio} controls />}
         </CardContent>
       </Card>
           
@@ -112,7 +127,11 @@ export default function FindPage() {
         ))}  
       </div>  
     </div>
-  )
+      
+    </div> 
+     
+    </>
+  );
 }
 
 
