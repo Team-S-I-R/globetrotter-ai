@@ -13,6 +13,84 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 AMADEUS_CLIENT_ID = "7MEvfgTSMXFdPgurtu2iscp7w2F6qBKA"
 AMADEUS_CLIENT_SECRET = "NBVGe1CHAW1tLSxK"
 
+NEW_GOOGLE_API_KEY = "AIzaSyCmIRr2omcRRr_dbASqK4KjDNdatz4zGK8"
+genai.configure(api_key=NEW_GOOGLE_API_KEY)
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+def generate_content(prompt):
+    try:
+        response = model.generate_content(prompt)
+        response_text = response.text
+        clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
+        return clean_response_text
+    except Exception as e:
+        print(f"Error generating content: {e}")
+        return None
+
+@app.route('/plan_trip', methods=['POST'])
+def plan_trip():
+    data = request.json
+    city = data.get('city')
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+    budget = data.get('budget')
+    max_distance = data.get('max_distance')
+    user_comments = data.get('comments', '')  # Optional user comments
+
+    prompt = f"""
+    You are a travel assistant. Generate a comprehensive travel plan for a trip to {city} from {start_date} to {end_date}.
+    The trip has a budget of {budget}, and the user wants to explore within {max_distance} km from {city}.
+    Include the following:
+
+    1. **Detailed Itinerary**: Provide a detailed daily itinerary with suggested activities and destinations.
+    2. **Packing List**: Suggest a packing list for the trip, taking into account the weather and local activities.
+    3. **Cultural Information**: Include key cultural practices, local cuisine, and must-see attractions in {city}.
+
+    Additional comments from the user: "{user_comments}"
+
+    Format the response as JSON with fields for 'itinerary', 'packing_list', and 'cultural_info', such as in the following:
+        {{
+    "itinerary": {{
+        "Day 1": "Arrive in New York City. Check into your hotel. Explore Times Square and have dinner at a local restaurant.",
+        "Day 2": "Visit the Statue of Liberty and Ellis Island. Spend the afternoon in Central Park. Evening Broadway show.",
+        "Day 3": "Tour the Metropolitan Museum of Art. Explore the Upper East Side. Dinner at a Michelin-starred restaurant.",
+        "Day 4": "Visit the Empire State Building and take in the city views. Shopping in Soho. Departure."
+    }},
+    "packing_list": [
+        "Comfortable walking shoes",
+        "Weather-appropriate clothing (e.g., light jacket, umbrella)",
+        "Travel-sized toiletries",
+        "Travel documents (ID, tickets)",
+        "Chargers for electronics",
+        "Reusable water bottle"
+    ],
+    "cultural_info": {{
+        "Cultural Practices": "New Yorkers value their time and are known for their directness. Tipping is customary in restaurants.",
+        "Local Cuisine": "Try iconic foods such as New York-style pizza, bagels, and hot dogs.",
+        "Must-See Attractions": [
+        "Statue of Liberty",
+        "Central Park",
+        "Empire State Building",
+        "Broadway",
+        "Metropolitan Museum of Art"
+        ]
+    }},
+    "additional_comments": "Remember to check for any local events or festivals happening during your visit. Enjoy your trip!"
+    }}
+    """
+    response_text = generate_content(prompt)
+    
+    if response_text:
+        try:
+            response_json = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            print(f"Error parsing response JSON: {e}")
+            response_json = {'error': 'Error parsing response from Gemini'}
+    else:
+        response_json = {'error': 'Error generating content from Gemini'}
+
+    return jsonify(response_json)
+
 @app.route('/travel', methods=['POST'])
 def generate_travel_guide():
     data = request.json
