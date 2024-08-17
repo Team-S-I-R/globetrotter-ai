@@ -19,33 +19,35 @@ AMADEUS_CLIENT_SECRET = "NBVGe1CHAW1tLSxK"
 def generate_travel_guide():
     data = request.json
     user_input = data.get('user_input', '')
+    obj = {"responseText":"Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area",
+           "details":[
+               {"parameter":"departure", "value":"<value>"},
+               {"parameter":"arrival", "value":"<value>"},
+               {"parameter":"start_date", "value":"<value>"},
+               {"parameter":"end_date", "value":"<value>"},
+               {"parameter":"numAdults", "value":"<value>"},
+               {"parameter":"numChildren", "value":"<value>"},
+               {"parameter":"numInfants", "value":"<value>"},
+               {"parameter":"baggage", "value":"<value>"},
+               {"parameter":"isOneWay", "value":"<true/false>"},
+               {"parameter":"classPreference", "value":"<value>"},
+               {"parameter":"directOnly", "value":"<true/false>"}
+           ]}
 
     prompt = f"""
     You are a travel booking assistant. The user provided the following information: "{user_input}".
-    Extract the data from the sentence, provide the output in the following JSON format:
-    {{
-        "responseText": "<Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area>",
-        "details": [
-            {{"parameter": "departure", "value": "<value>"}},
-            {{"parameter": "arrival", "value": "<value>"}},
-            {{"parameter": "start_date", "value": "<value>"}},
-            {{"parameter": "end_date", "value": "<value>"}},
-            {{"parameter": "numAdults", "value": "<value>"}},
-            {{"parameter": "numChildren", "value": "<value>"}},
-            {{"parameter": "numInfants", "value": "<value>"}},
-            {{"parameter": "baggage", "value": "<value>"}},
-            {{"parameter": "isOneWay", "value": <true/false>}},
-            {{"parameter": "classPreference", "value": "<value>"}},
-            {{"parameter": "directOnly", "value": <true/false>}}
-        ],
-    }}
+    Use data from the sentence to output in the following JSON format. do not include formatting or code blocks:
+    {json.dumps(obj)}
     """
     try:
         response = model.generate_content(prompt)
         response_text = response.text
-        print(response)
+        print("PROMPT")
+        print(prompt)
+        print("RESPONSE")
+        print(json.loads(response_text))
         clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
-        return jsonify({'response': clean_response_text})
+        return json.loads(response_text)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

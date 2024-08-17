@@ -41,3 +41,6 @@ videos/*
 !videos/*.js
 !videos/*.ts
 public/_next-video
+
+globetrotter-app/globetrotter-key.json
+
