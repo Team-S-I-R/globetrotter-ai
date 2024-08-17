@@ -5,6 +5,7 @@ import google.logging as logging
 import json
 import os
 from flask_cors import CORS
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -24,13 +25,32 @@ chat = model.start_chat(
     history=[]
 )
 
-
+def format_date(date_str):
+    try:
+        date_obj = datetime.strptime(date_str, '%B %d, %Y')
+        return date_obj.strftime('%Y-%m-%d')
+    except ValueError:
+        print(f"Error formatting date: {date_str}")
+        return None
+    
+def get_airport_code(city):
+    prompt = f"""
+    You are a travel assistant. Provide the IATA airport code for the closest airport to {city} in one word. For example, if I put Los Angeles, you should simply provide 'LAX'.
+    """
+    response_text = generate_content(prompt)
+    print(f"Generated content for airport code: {response_text}")  # Debug print
+    if response_text:
+        return response_text.strip()  # Clean up any extraneous whitespace
+    else:
+        print("Error: No response text received")
+        return None
+    
 def generate_content(prompt):
     try:
         response = chat.send_message(prompt)
         response_text = response.text
-        clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
-        return clean_response_text
+        print(f"Generated response text: {response_text}")  # Debug print
+        return response_text
     except Exception as e:
         print(f"Error generating content: {e}")
         return None
@@ -103,44 +123,87 @@ def plan_trip():
 def generate_travel_guide():
     data = request.json
     user_input = data.get('user_input', '')
-    obj = {"responseText":"Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area",
-           "details":[
-               {"parameter":"departure", "value":"<value>"},
-               {"parameter":"arrival", "value":"<value>"},
-               {"parameter":"start_date", "value":"<value>"},
-               {"parameter":"end_date", "value":"<value>"},
-               {"parameter":"numAdults", "value":"<value>"},
-               {"parameter":"numChildren", "value":"<value>"},
-               {"parameter":"numInfants", "value":"<value>"},
-               {"parameter":"baggage", "value":"<value>"},
-               {"parameter":"isOneWay", "value":"<true/false>"},
-               {"parameter":"budget", "value":"<value>"},
-               {"parameter":"directOnly", "value":"<true/false>"}
-           ]}
 
+    # Placeholder for response object to be updated based on user input
+    obj = {
+        "responseText": "Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area",
+        "details": [
+            {"parameter": "departure", "value": "<value>"},
+            {"parameter": "arrival", "value": "<value>"},
+            {"parameter": "start_date", "value": "<value>"},
+            {"parameter": "end_date", "value": "<value>"},
+            {"parameter": "numAdults", "value": "<value>"},
+            {"parameter": "numChildren", "value": "<value>"},
+            {"parameter": "numInfants", "value": "<value>"},
+            {"parameter": "baggage", "value": "<value>"},
+            {"parameter": "isOneWay", "value": "<true/false>"},
+            {"parameter": "budget", "value": "<value>"},
+            {"parameter": "directOnly", "value": "<true/false>"}
+        ]
+    }
+    
+    # Placeholder for response processing
     prompt = f"""
-    You are a travel booking assistant. The user provided the following information: "{user_input}".
-    Use data from the sentence to output in the following JSON format. do not include formatting or code blocks.
+    You are Globetrotter AI, a travel booking assistant. The user provided the following information: "{user_input}".
+    Use data from the sentence to output in the following JSON format. Do not include formatting or code blocks.
     The user will be speaking to you in a conversation. Please infer the user's intent from the context and fill out the values in the json object based on the user's intent.
     If the user is talking about where they would like to travel to, please use the input to fill the 'arrival' parameter.
     If the user is asking about the dates, please use the input to fill the 'start_date' and 'end_date' parameters.
     If the user is asking about the number of people traveling, please use the input to fill the 'numAdults', 'numChildren', and 'numInfants' parameters.
-    Also, as you are having the conversation, If you update a value in the json object, please remember these values. Add them to your memory and send them
-    every time you send a response along with the new values you discover in the conversation.
+    Also, as you are having the conversation, if you update a value in the json object, please remember these values. Add them to your memory and send them
+    every time you send a response along with the new values you discover in the conversation. Also, you should understand that the user needs to tell you where they want to go to and from, start date, end date, how many adults, children, and infants, and one way or rounded before you search for a flight. Your developers implemented a way for the route you are in to search for flights when you save the information within the details area. So if someone asks about searching flights you'll lead them through what you need from them. 
     {json.dumps(obj)}
     """
+    
     try:
         response = chat.send_message(prompt)
         response_text = response.text
-        print("PROMPT")
-        print(prompt)
-        print("RESPONSE")
-        print(json.loads(response_text))
         clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
-        return json.loads(response_text)
+        response_json = json.loads(clean_response_text)
+        
+        # Extract flight search details
+        flight_search_details = response_json.get('details', [])
+        search_params = {param['parameter']: param['value'] for param in flight_search_details}
+
+        # Prepare parameters for flight search
+        departure = search_params.get('departure')
+        arrival = search_params.get('arrival')
+        start_date = search_params.get('start_date')
+        end_date = search_params.get('end_date')
+        num_adults = search_params.get('numAdults')
+        num_children = search_params.get('numChildren')
+        num_infants = search_params.get('numInfants')
+        is_one_way = search_params.get('isOneWay', 'true') == 'true'
+
+        # Ensure that required parameters are present
+        if departure and arrival and start_date and end_date:
+            access_token = get_access_token()
+            if not access_token:
+                return jsonify({'error': 'Unable to fetch access token'}), 500
+
+            # Convert parameters to integers if present
+            num_adults = int(num_adults) if num_adults else 1
+            num_children = int(num_children) if num_children else 0
+            num_infants = int(num_infants) if num_infants else 0
+
+            flight_data = search_flights(
+                access_token,
+                city_from=departure,
+                city_to=arrival,
+                departure_date=start_date,
+                return_date=end_date,
+                adults=num_adults,
+                children=num_children,
+                infants=num_infants,
+                is_one_way=is_one_way
+            )
+            response_json['searched_flights'] = flight_data if flight_data else {}
+        else:
+            response_json['searched_flights'] = {}
+        
+        return jsonify(response_json)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 def get_access_token():
     try:
@@ -159,19 +222,38 @@ def get_access_token():
         print(f"Error fetching access token: {e}")
         return None
 
-def search_flights(access_token, origin, destination, departure_date, return_date=None, adults=1, children=0, infants=0, is_one_way=True):
+def search_flights(access_token, city_from, city_to, departure_date, return_date=None, adults=1, children=0, infants=0, is_one_way=True):
     try:
+        origin = get_airport_code(city_from)
+        destination = get_airport_code(city_to)
+
+        print(f"Origin: {origin}, Destination: {destination}")  # Debug print
+
+        if not origin or not destination:
+            print("Error: Unable to retrieve airport codes")
+            return None
+
+        # Format the dates
+        formatted_departure_date = format_date(departure_date)
+        formatted_return_date = format_date(return_date) if return_date else None
+
+        if not formatted_departure_date:
+            print("Error: Unable to format departure date")
+            return None
+
         params = {
             'originLocationCode': origin,
             'destinationLocationCode': destination,
-            'departureDate': departure_date,
+            'departureDate': formatted_departure_date,
             'adults': adults,
             'children': children,
             'infants': infants,
             'max': 5 
         }
-        if not is_one_way:
-            params['returnDate'] = return_date
+        if not is_one_way and formatted_return_date:
+            params['returnDate'] = formatted_return_date
+
+        print(f"Request Parameters: {params}")  # Debug print
 
         response = requests.get(
             'https://test.api.amadeus.com/v2/shopping/flight-offers',
@@ -179,6 +261,9 @@ def search_flights(access_token, origin, destination, departure_date, return_dat
             params=params
         )
         response.raise_for_status()
+
+        print(f"Flight API Response: {response.json()}")  # Debug print
+
         flight_data = response.json()
 
         parsed_flights = []
@@ -212,7 +297,6 @@ def search_flights(access_token, origin, destination, departure_date, return_dat
             'total_results': flight_data.get('meta', {}).get('totalCount', 0),
             'flights': parsed_flights
         }
-
     except requests.exceptions.RequestException as e:
         print(f"Error searching flights: {e}")
         return None
