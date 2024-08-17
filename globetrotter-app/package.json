@@ -14,6 +14,8 @@
     "@prisma/client": "^5.18.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
+    "@react-three/drei": "^9.111.0",
+    "@react-three/fiber": "^8.17.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.5",
@@ -28,6 +30,7 @@
     "shadcn-ui": "^0.2.3",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.167.1",
     "tls": "^0.0.1"
   },
   "devDependencies": {

@@ -18,7 +18,7 @@ export default function Hero() {
         if (status.pending !== true) {
             return (
                 <button
-                className='w-full rounded-md border border-input bg-background hover:bg-foreground hover:text-background transition hover:scale-[103%] transform px-3 py-2 text-sm' type="submit">
+                className='w-full select-none rounded-md border border-input bg-background hover:bg-foreground hover:text-background transition hover:scale-[103%] transform px-3 py-2 text-sm' type="submit">
                     Submit
                 </button>
             )
@@ -27,7 +27,7 @@ export default function Hero() {
         if (status.pending === true) {
             return (
             <>
-             <button className='w-full rounded-md border border-input bg-background hover:bg-foreground hover:text-background transition hover:scale-[103%] transform px-3 py-2 text-sm' type="submit" disabled>
+             <button className='w-full select-none rounded-md border border-input bg-background hover:bg-foreground hover:text-background transition hover:scale-[103%] transform px-3 py-2 text-sm' type="submit" disabled>
                 Submitting...
             </button>
             </>
@@ -56,9 +56,9 @@ export default function Hero() {
         <div className="flex flex-col gap-4 w-full h-full place-items-center place-content-center">
 
     
-            <h1 className="text-6xl">Globetrotter AI</h1>
+            <h1 className="text-6xl uppercase font-bold select-none">Globetrotter AI</h1>
           <div className="w-1/2  flex flex-col gap-2 place-items-center">
-            <p>Join the wait list</p>
+            <p className='select-none'>Join the wait list</p>
             <form action={action} className=' w-full flex flex-col gap-2'>
                 <Input  type='email' name='Email' autoFocus placeholder="Email" />
                 <Input type='text' name='Name' placeholder="Name" />

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input";
 import { useRecordVoice } from "@/hooks/recordVoice";
 import { useState } from "react";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
@@ -9,6 +10,8 @@ import { useState } from "react";
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
   const { startRecording, stopRecording, text } = useRecordVoice();
+
+  const dummytext = 'Hi, my name is T, I am looking to travel to Japan. What kind of food can I eat?'
   // const [text, setText] = useState("");
 
   const handleClick = async (base64data: any) => {
@@ -51,6 +54,8 @@ export default function FindPage() {
     // startStream();
   }
 
+  
+
   return (
     <div className="container mx-auto p-4">
       <Card>
@@ -61,9 +66,26 @@ export default function FindPage() {
           <Button onClick={handleClick}>translate!</Button>
           <Button onClick={startRecording}>Start!</Button>
           <Button onClick={stopRecording}>Stop!</Button>
-          <p>{text}</p>
         </CardContent>
       </Card>
+          
+       <div className="w-full">
+          <Input value={dummytext}/>
+        </div>   
     </div>
   )
 }
+
+
+// steps
+
+
+// speech to text
+
+// feed to ai
+
+//  get response,
+
+// tts to user
+
+// then fill in data
