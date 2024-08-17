@@ -15,6 +15,7 @@ export default function FindPage() {
   // const [text, setText] = useState("");
   const dummytext = "This is a test message";
 
+  // this should make the ai talk and it should say the responsetext
   const handleClick = async (msg: String) => {
     try {
       const response = await fetch(`./api/tts`, {
