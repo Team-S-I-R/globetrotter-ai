@@ -1,70 +1,71 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
+import path from "path";
+import { SpeechClient, protos } from "@google-cloud/speech";
 
-// Imports the Google Cloud client library
-const speech = require("@google-cloud/speech");
+const googleCredentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64;
 
-process.env.GOOGLE_APPLICATION_CREDENTIALS = "./globetrotter-key.json"
+if (!googleCredentialsBase64) {
+  throw new Error("GOOGLE_APPLICATION_CREDENTIALS_BASE64 environment variable is not set");
+}
 
-// Creates a client
-const client = new speech.SpeechClient();
+const decodedCredentials = Buffer.from(googleCredentialsBase64, "base64").toString("utf-8");
+
+const tmpDir = path.join(process.cwd(), "tmp");
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir);
+}
+const credentialsPath = path.join(tmpDir, "globetrotter-key.json");
+
+fs.writeFileSync(credentialsPath, decodedCredentials);
+
+process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+
+const client = new SpeechClient();
 
 export async function POST(req: any) {
-  // The path to the remote LINEAR16 file
-  //   const gcsUri = 'gs://cloud-samples-data/speech/brooklyn_bridge.raw';
   const body = await req.json();
   const base64Audio = body.audio;
 
-  // Convert the base64 audio data to a Buffer
+  if (!base64Audio) {
+    return NextResponse.json({ error: "No audio data provided" }, { status: 400 });
+  }
+
   const audio = Buffer.from(base64Audio, "base64");
 
-  // Define the file path for storing the temporary WAV file
-  const filePath = "tmp/input.wav";
-
-  // Write the audio data to a temporary WAV file synchronously
+  const filePath = path.join(tmpDir, "input.wav");
   fs.writeFileSync(filePath, audio);
 
-  // Create a readable stream from the temporary WAV file
-  // const readStream = fs.createReadStream(filePath);
-
-  // The audio file's encoding, sample rate in hertz, and BCP-47 language code
   const aud = {
     content: fs.readFileSync(filePath).toString("base64"),
   };
-  const config = {
-    encoding: "WEBM_OPUS",
+  const config: protos.google.cloud.speech.v1.IRecognitionConfig = {
+    encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.WEBM_OPUS,
     sampleRateHertz: 48000,
     languageCode: "en-US",
   };
-  const request = {
+  const request: protos.google.cloud.speech.v1.IRecognizeRequest = {
     audio: aud,
     config: config,
-    //  interimResults: false,
   };
 
-  // Stream the audio to the Google Cloud Speech API
-//   let text = '';
-  // const recognizeStream = client
-  //   .streamingRecognize(request)
-  //   .on('error', console.error)
-  //   .on('data', (data: any) => {
-  //     console.log(
-  //       `Transcription: ${data.results[0].alternatives[0].transcript}`
-  //     );
-  //     text = data.results[0].alternatives[0].transcript;
-  //   })
-
-  // Detects speech in the audio file
   const [response] = await client.recognize(request);
-  const transcription = response.results
-    .map((result: any) => result.alternatives[0].transcript)
-    .join("\n");
 
-  //   fs.createReadStream(filePath).pipe(recognizeStream);
+  let transcription = "No transcription available";
 
-  // Remove the temporary file after successful processing
-  //   fs.unlinkSync(filePath);
+  if (response.results && response.results.length > 0) {
+    transcription = response.results
+      .map((result: protos.google.cloud.speech.v1.ISpeechRecognitionResult) => {
+        if (result.alternatives && result.alternatives.length > 0) {
+          return result.alternatives[0].transcript;
+        }
+        return "";
+      })
+      .join("\n");
+  }
+
+  fs.unlinkSync(filePath);
 
   console.log(`Transcription: ${transcription}`);
-  return NextResponse.json({text:transcription});
+  return NextResponse.json({ text: transcription });
 }
