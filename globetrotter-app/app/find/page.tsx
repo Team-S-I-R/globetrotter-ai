@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { useRecordVoice } from "@/hooks/recordVoice";
 import { useState } from "react";
+import Header from "../gt-components/header";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 
 export default function FindPage() {
@@ -33,12 +34,24 @@ export default function FindPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card>
+    <>
+    <div className="absolute top-0 left-0">
+        <Header/>  
+    </div>
+
+      <div className="w-screen h-screen py-[80px]">
+      <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
+     
+          
+      <div className="w-full">
+          <Input value={dummytext}/>
+      </div>  
+
+      <Card className="w-full h-max flex flex-col place-items-center place-content-center">
         <CardHeader>
           <CardTitle>Transcripting</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex gap-4">
           <Button onClick={() => handleClick(text)}>translate!</Button>
           <Button onClick={startRecording}>Start!</Button>
           <Button onClick={stopRecording}>Stop!</Button>
@@ -46,11 +59,12 @@ export default function FindPage() {
           {audio && <audio src={audio} controls />}
         </CardContent>
       </Card>
-          
-       <div className="w-full">
-          <Input value={dummytext}/>
-        </div>   
+
     </div>
+      
+    </div> 
+     
+    </>
   );
 }
 
