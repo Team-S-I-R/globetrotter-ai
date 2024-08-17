@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input";
 import { useRecordVoice } from "@/hooks/recordVoice";
 import { useState } from "react";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
@@ -11,6 +12,7 @@ export default function FindPage() {
   const { startRecording, stopRecording, text } = useRecordVoice();
   const [audio, setAudio] = useState("");
   // const [text, setText] = useState("");
+  const dummytext = "This is a test message";
 
   const handleClick = async (msg: String) => {
     try {
@@ -44,6 +46,24 @@ export default function FindPage() {
           {audio && <audio src={audio} controls />}
         </CardContent>
       </Card>
+          
+       <div className="w-full">
+          <Input value={dummytext}/>
+        </div>   
     </div>
   );
 }
+
+
+// steps
+
+
+// speech to text
+
+// feed to ai
+
+//  get response,
+
+// tts to user
+
+// then fill in data
