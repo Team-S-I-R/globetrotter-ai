@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { SpeechClient, protos } from "@google-cloud/speech";
 
 const googleCredentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64;
@@ -9,19 +7,16 @@ if (!googleCredentialsBase64) {
   throw new Error("GOOGLE_APPLICATION_CREDENTIALS_BASE64 environment variable is not set");
 }
 
-const decodedCredentials = Buffer.from(googleCredentialsBase64, "base64").toString("utf-8");
+// Decode the credentials JSON from base64
+const decodedCredentials = JSON.parse(Buffer.from(googleCredentialsBase64, "base64").toString("utf-8"));
 
-const tmpDir = path.join(process.cwd(), "tmp");
-if (!fs.existsSync(tmpDir)) {
-  fs.mkdirSync(tmpDir);
-}
-const credentialsPath = path.join(tmpDir, "globetrotter-key.json");
-
-fs.writeFileSync(credentialsPath, decodedCredentials);
-
-process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
-
-const client = new SpeechClient();
+// Initialize the SpeechClient with credentials in memory (no file)
+const client = new SpeechClient({
+  credentials: {
+    client_email: decodedCredentials.client_email,
+    private_key: decodedCredentials.private_key,
+  },
+});
 
 export async function POST(req: any) {
   const body = await req.json();
@@ -31,19 +26,19 @@ export async function POST(req: any) {
     return NextResponse.json({ error: "No audio data provided" }, { status: 400 });
   }
 
-  const audio = Buffer.from(base64Audio, "base64");
-
-  const filePath = path.join(tmpDir, "input.wav");
-  fs.writeFileSync(filePath, audio);
+  // Decode the base64 audio directly from the request body
+  const audioBuffer = Buffer.from(base64Audio, "base64");
 
   const aud = {
-    content: fs.readFileSync(filePath).toString("base64"),
+    content: audioBuffer.toString("base64"),
   };
+
   const config: protos.google.cloud.speech.v1.IRecognitionConfig = {
     encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.WEBM_OPUS,
     sampleRateHertz: 48000,
     languageCode: "en-US",
   };
+
   const request: protos.google.cloud.speech.v1.IRecognizeRequest = {
     audio: aud,
     config: config,
@@ -64,8 +59,6 @@ export async function POST(req: any) {
         })
         .join("\n");
     }
-
-    fs.unlinkSync(filePath);
 
     console.log(`Transcription: ${transcription}`);
     return NextResponse.json({ text: transcription });

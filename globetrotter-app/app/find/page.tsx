@@ -344,7 +344,7 @@ const [showTip, setShowTip] = useState(false);
         </motion.div>
 
 
-        {text.length > 0 && (
+        {text?.length > 0 && (
           <>
         <motion.div 
         initial={{ opacity: 0, y: -200 }}
