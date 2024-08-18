@@ -112,6 +112,7 @@ const [showTip, setShowTip] = useState(false);
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
           body: JSON.stringify({
             user_input: message
@@ -231,14 +232,14 @@ const [showTip, setShowTip] = useState(false);
 
               <div className="w-full h-full "></div>
               
-              {searchedFlights.flights?.length > 0 && (
+              {searchedFlights?.flights?.length > 0 && (
                 <>
                 <div className="w-[300px] max-w-[400px] p-2 h-max bg-white rounded-xl absolute z-[1000] top-[30vh] right-10">
                   <motion.div
                       initial={{ opacity: 0, x: 1000 }}
                       animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}                 
                       className="flex flex-col w-full h-full">
-                          {searchedFlights.flights?.length > 0 && ( // {{ edit_1 }}
+                          {searchedFlights?.flights?.length > 0 && ( // {{ edit_1 }}
                             <>
                             <motion.div
                             initial={{ opacity: 0, x: -200 }}
@@ -254,7 +255,7 @@ const [showTip, setShowTip] = useState(false);
                             className="flex flex-col w-full h-[300px] overflow-hidden m-[1px] p-2 ">
                               {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
                               <div className="w-full h-full overflow-y-scroll no-scrollbar">
-                                {searchedFlights.flights.map((flight, index) => ( // {{ edit_1 }}
+                                {searchedFlights?.flights?.map((flight, index) => ( // {{ edit_1 }}
                                   <motion.div 
                                   initial={{ opacity: 0, x: 1000 }}
                                   animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                        
