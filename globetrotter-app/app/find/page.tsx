@@ -16,6 +16,14 @@ import { useToast } from "@/components/ui/use-toast";
 import quote from '../assets/quote.png'
 import clouods from '../assets/cloud.gif'
 import singlecloud from '../assets/singlecloud.png'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { LightbulbIcon } from "lucide-react";
+import { X } from "lucide-react";
 
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
@@ -51,6 +59,7 @@ export default function FindPage() {
   //   {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
   // ]});
 // 
+const [showTip, setShowTip] = useState(false);
 
   // this should make the ai talk and it should say the responsetext
   const handleAiTalking = async (msg: String) => {
@@ -73,7 +82,7 @@ export default function FindPage() {
 
   useEffect(() => {
     if (text?.length > 1) {
-      toast({ title: 'Test!', description: '', itemID: 'success' });
+      toast({ title: 'Sending your message off!', description: '', itemID: 'success' });
       setTimeout(() => pythonMessage(text), 1000);
     }
   }, [text]);
@@ -115,7 +124,7 @@ export default function FindPage() {
         handleAiTalking(data.responseText);
         // setSearchedFlights(data.searched_flights);
         setTimeout(() => {
-          toast({ title: '✅ Success!', description: '', itemID: 'success' });
+          toast({ title: '✅ Success!', description: 'Response received...Responding to user now.', itemID: 'success' });
         }, 1000);
       } catch (error) {
         console.log(error);
@@ -266,7 +275,64 @@ export default function FindPage() {
               <div className="w-full h-full "></div>
             </div>
 
+
         </div>
+
+        {showTip === true && (
+          <>
+        <motion.div 
+          initial={{ opacity: 0, y: 200 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+          className="flex flex-col  absolute overflow-hidden bottom-10 left-10 z-[100] bg-white place-content-start gap-8  w-[300px] h-[250px] rounded-lg m-[1px] p-6">      
+            <div onClick={() => setShowTip(false)} className="w-max bg-white h-max m-4 absolute  top-0 right-0 z-[100]">
+               <X/> 
+            </div>
+            <div className="w-full text-xs h-full overflow-y-scroll no-scrollbar">
+            <p className="text-3xl font-bold">You made it to the Globetrotter Demo!</p>
+            <p><strong>Now what? </strong>Here are some keys to success!</p>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="item-1">
+                <AccordionTrigger>How to Start!?</AccordionTrigger>
+                <AccordionContent>
+                <li>Press the start button to get started</li>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger>How to Stop!?</AccordionTrigger>
+                <AccordionContent>
+                <li>When you press Stop!, your audio will be captured and the conversation will start!</li>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger>Then what?</AccordionTrigger>
+                <AccordionContent>
+                <li>The goal is for the checklist to fill based on your conversation, and maybe Globetrotter will find you some good deals on flights (will show on the right side!)</li>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Easter Eggs :o</AccordionTrigger>
+                <AccordionContent>
+                <li>If you are here then you found the first one! What if we told you there is one more! Have you pressed the arrow keys yet?</li>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            </div>
+        </motion.div>
+          </>
+        )}
+
+          {showTip === false && (
+             <motion.div 
+             onClick={() => setShowTip(true)}
+             initial={{ opacity: 0, x: -200 }}
+             animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+             className="flex hover:scale-[110%] cursor-pointer flex-col place-items-center place-content-center absolute overflow-hidden bottom-10 left-10 z-[100] bg-white   w-[30px] h-[30px] rounded-full m-[1px] p-6">      
+                <span className="text-3xl hover:text-orange-400 "><LightbulbIcon/></span> 
+           </motion.div> 
+          )}
+
+        
+
 
         {/* plane */}
         <motion.div 
@@ -287,6 +353,10 @@ export default function FindPage() {
         </motion.div>
           </>
           )}
+
+        
+
+
 
         {/* button */}
         <motion.div 
