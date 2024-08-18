@@ -15,7 +15,7 @@ export default function Header() {
     return (
     <>
     <header className="flex justify-between p-6">
-    <p  className="text-xl font-bold">Globetrotter</p>
+    <a href="/" className="text-xl font-bold">Globetrotter</a>
     <div></div>
     {/* <NavigationMenu>
         <NavigationMenuList>
