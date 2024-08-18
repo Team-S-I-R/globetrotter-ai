@@ -5,7 +5,7 @@ import Header from "./gt-components/header";
 
 export default function Home() {
   return (
-    <main className="w-screen h-screen overflow-y-scroll">
+    <main className="no-scrollbar w-screen h-screen overflow-y-scroll">
       <div className="w-full h-full flex flex-col place-items-center place-content-center">
         <div className="w-full">
         <Header />

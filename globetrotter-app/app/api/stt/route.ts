@@ -49,23 +49,28 @@ export async function POST(req: any) {
     config: config,
   };
 
-  const [response] = await client.recognize(request);
+  try {
+    const [response] = await client.recognize(request);
 
-  let transcription = "No transcription available";
+    let transcription = "No transcription available";
 
-  if (response.results && response.results.length > 0) {
-    transcription = response.results
-      .map((result: protos.google.cloud.speech.v1.ISpeechRecognitionResult) => {
-        if (result.alternatives && result.alternatives.length > 0) {
-          return result.alternatives[0].transcript;
-        }
-        return "";
-      })
-      .join("\n");
+    if (response.results && response.results.length > 0) {
+      transcription = response.results
+        .map((result: protos.google.cloud.speech.v1.ISpeechRecognitionResult) => {
+          if (result.alternatives && result.alternatives.length > 0) {
+            return result.alternatives[0].transcript;
+          }
+          return "";
+        })
+        .join("\n");
+    }
+
+    fs.unlinkSync(filePath);
+
+    console.log(`Transcription: ${transcription}`);
+    return NextResponse.json({ text: transcription });
+  } catch (error) {
+    console.error("Error during transcription:", error);
+    return NextResponse.json({ error: "Failed to transcribe audio" }, { status: 400 });
   }
-
-  fs.unlinkSync(filePath);
-
-  console.log(`Transcription: ${transcription}`);
-  return NextResponse.json({ text: transcription });
 }

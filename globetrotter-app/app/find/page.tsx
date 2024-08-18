@@ -14,20 +14,46 @@ import PlaneModel from "../gt-components/3dstuff/plane";
 import { useToast } from "@/components/ui/use-toast";
 // import { audioInputStreamTransform, recorder, sampleRateHertz, startStream } from "./recorder";
 import quote from '../assets/quote.png'
-
+import clouods from '../assets/cloud.gif'
+import singlecloud from '../assets/singlecloud.png'
 
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
-  const { startRecording, stopRecording, text, recording } = useRecordVoice();
+  const { startRecording, stopRecording, text, recording, textIsDone, setTextIsDone } = useRecordVoice();
   const [audio, setAudio] = useState("");
   const [conversationText, setConversationText] = useState("");
+  // const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([
+  //   { parameter: "Default Parameter", value: "Default Value" },
+  //   { parameter: "Default Parameter", value: "Default Value" },
+  //   { parameter: "Default Parameter", value: "Default Value" },
+  //   { parameter: "Default Parameter", value: "Default Value" },
+  // ]);
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([
+    { parameter: "Arriving To", value: "Los Angeles" },
+    { parameter: "Number of People", value: "2" },
+    { parameter: "Budget", value: "$500" },
+    { parameter: "Airline", value: "Delta" },
   ]);
   const { toast } = useToast()
   const [scope, animate] = useAnimate();
+  const [debugInput, setDebugInput] = useState("");
+  const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [
+    {id: 1, departure: "New York", arrival: "Los Angeles", date: "2023-03-01", price: 200}, 
+    {id: 2, departure: "Chicago", arrival: "San Francisco", date: "2023-03-05", price: 250},
+    {id: 3, departure: "Boston", arrival: "Las Vegas", date: "2023-03-05", price: 550},
+    {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
+  ]});
+  const [startGame, setStartGame] = useState(false);
+  // const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [
+  //   {id: 1, departure: "New York", arrival: "Los Angeles", date: "2023-03-01", price: 200}, 
+  //   {id: 2, departure: "Chicago", arrival: "San Francisco", date: "2023-03-05", price: 250},
+  //   {id: 3, departure: "Boston", arrival: "Las Vegas", date: "2023-03-05", price: 550},
+  //   {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
+  // ]});
+// 
 
   // this should make the ai talk and it should say the responsetext
-  const handleClick = async (msg: String) => {
+  const handleAiTalking = async (msg: String) => {
     try {
       const response = await fetch(`./api/tts`, {
         method: "POST",
@@ -45,6 +71,13 @@ export default function FindPage() {
     }
   };
 
+  useEffect(() => {
+    if (text?.length > 1) {
+      toast({ title: 'Test!', description: '', itemID: 'success' });
+      setTimeout(() => pythonMessage(text), 1000);
+    }
+  }, [text]);
+
   // const fetchTravelData = async () => {
   //   try {
   //     const response = await axios.post('http://127.0.0.1:5000/travel', {
@@ -60,109 +93,178 @@ export default function FindPage() {
   
   // fetchTravelData();
 
-  const pythonMessage = async () => {
+  const pythonMessage = async (message: string) => {
 
-    // if (text === "") {
-    //   console.error("No text provided for processing.");
-    //   toast({ title: '❌ Error, Please Try Again!', description: 'Please press the start button to start a conversation.', itemID: 'error' });
-    //   return;
-    // }
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/travel`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_input: message
+          }),
+        });
 
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/travel`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_input: text
-        }),
-      });
+        const data = await response.json();
 
-      const data = await response.json();
-
-      console.log(data);
-      setConversationText(data.responseText);
-      setDetails(data.details); // Assuming the response contains a 'details' field
-      toast({ title: '✅ Success!', description: conversationText, itemID: 'success' });
-    } catch (error) {
-      console.log(error);
-      toast({ title: '❌ Error!', description: 'There was an error processing your request. Please press the start button to start a conversation.', itemID: 'error' });
-    }
+        setConversationText(data.responseText);
+        setDetails(data.details); // Assuming the response contains a 'details' field
+        console.log(data)
+        setDebugInput(data.the_user_input);
+        handleAiTalking(data.responseText);
+        // setSearchedFlights(data.searched_flights);
+        setTimeout(() => {
+          toast({ title: '✅ Success!', description: '', itemID: 'success' });
+        }, 1000);
+      } catch (error) {
+        console.log(error);
+        toast({ title: '❌ Error!', description: 'There was an error processing your request. Please press the start button to start a conversation.', itemID: 'error' });
+      }
+    
   }
+
 
   return (
     <>
+    {/* mobile */}
+    <motion.div className="w-full bg-white h-full flex flex-col  absolute z-[100] sm:hidden">
+        <Header/>
+        <div className="w-2/3 p-2 rounded-lg bg-white text-center absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+          <p className="">Hi!, Thanks for your interest in <strong>Globetrotter!</strong></p>
+          <p className="">We recommend using a larger screen for a better experience</p>
+        </div>
+        <img className="w-full h-full" src={clouods.src} alt="" />
+    </motion.div>
+    
+    {/*header */}
     <div className="absolute top-0 left-0">
         <Header/>  
     </div>
 
-    <div className="opacity-30 w-full h-full absolute flex place-items-center place-content-center z-[1]">
-      <div className="w-[2px] h-full bg-black"></div>
+{/* images */}
+    <div className="opacity-30 w-full h-full absolute flex place-items-center place-content-center z-[-1]">
+      {/* <div className="w-[3px] h-full bg-black"></div> */}
+      <img className="w-full h-full" src={clouods.src} alt="" />
     </div>
 
-    <div className="w-screen h-screen py-[40px]">
+{/* images */}
+    <div className=" w-full h-full absolute flex place-items-center place-content-center z-[-1]">
+      <div className="w-full h-full absolute bg-gradient-to-b from-white via-white to-transparent"></div>
+    </div>
+
+{/* main div */}
+    <div className="w-screen h-screen">
       
-      <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
+      <div className="w-full h-full flex flex-col mx-auto p-4">
       
-
-
-        {/* beautiful content will go here */}
-        <div className="w-full relative h-screen flex flex-col place-items-center place-content-start py-8">
-          
-          
-
-            <div  className="w-full h-full grid gap-1 grid-cols-2 place-items-center  px-4 justify-between no-scrollbar overflow-y-scroll">
-            
-                <div className="flex flex-col w-full">
-                <motion.p 
+        {/* mapped content will go here */}
+        <div className="w-full relative h-max flex flex-col place-items-center place-content-start">
+        
+            <div  className="w-full h-full grid gap-1 grid-cols-2 grid-rows-2 place-items-center pr-1  no-scrollbar overflow-y-scroll">
+              
+              <motion.div 
+              initial={{ opacity: 0, x: -200 }}
+              animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}              
+              className="flex flex-col w-full">
+                {/* <motion.p 
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}
-                className="select-none w-full">
+                className="absolute top-0 left-0 z-[1000] select-none w-full">
                   {conversationText}
-                </motion.p>
-              
-              
+                  {text}
+                </motion.p> */}
+                       
               {details?.length > 0 && (
-
                 <>
-
+                <div className="w-[200px] max-w-[300px] p-2 h-max bg-white rounded-xl absolute top-[20vh] left-10">
                 <motion.div
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-                className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                className="flex place-items-center gap-4 w-full m-[1px] p-2">
                   <img className="w-[20px]" src={quote.src} alt="" />
+                  <p className="font-bold">Checklist!</p>
                 </motion.div>
-
 
                 <motion.div 
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
-                className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                className="flex flex-col w-full h-full m-[1px] p-2 ">
                   {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
                   {details?.map((detail, index) => ( 
-                    <div key={index} className="detail select-none w-full p-2 text-black">
-                      <p className="select-none text-lg text-left"><span className="font-bold">{detail.parameter}</span>: {detail.value}</p>
-                    </div>
+                    <motion.div 
+                    initial={{ opacity: 0, x: -200 }}
+                    animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+                    key={index} className="detail relative h-max select-none w-full h-max p-2 text-black">
+                      <motion.p  
+                      initial={{ opacity: 0, x: -200 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
+                      className="select-none text-sm text-left"><span className="font-bold">{detail.parameter}</span>: {detail.value}</motion.p>
+                      {/* <img className=" top-0 w-[100px] h-[100px]" src={singlecloud.src} alt="" /> */}
+                    </motion.div>
                   ))}
-                </motion.div>
-                  
+                </motion.div>                 
+                </div>
                   </>
               )}
 
+              </motion.div>
+
+              <div className="w-full h-full "></div>
+              
+              {searchedFlights.flights?.length > 0 && (
+                <>
+                <div className="w-[200px] max-w-[300px] p-2 h-max bg-white rounded-xl absolute top-[30vh] right-10">
+                  <motion.div
+                      initial={{ opacity: 0, x: 1000 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}                 
+                      className="flex flex-col w-full h-full">
+                          {searchedFlights.flights?.length > 0 && ( // {{ edit_1 }}
+                            <>
+                            <motion.div
+                            initial={{ opacity: 0, x: -200 }}
+                            animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+                            className="flex place-items-center gap-4 w-full m-[1px] p-2">
+                              <img className="w-[20px]" src={quote.src} alt="" />
+                              <p className="font-bold">Flights!</p>
+                            </motion.div>
+
+                            <motion.div 
+                            initial={{ opacity: 0, x: -200 }}
+                            animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
+                            className="flex flex-col w-full h-full m-[1px] p-2 ">
+                              {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
+                              {searchedFlights.flights.map((flight, index) => ( // {{ edit_1 }}
+                                <motion.div 
+                                initial={{ opacity: 0, x: 1000 }}
+                                animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                        
+                                key={index} className=" detail select-none w-full p-2 text-orange-400">
+                                  <motion.p 
+                                  initial={{ opacity: 0, x: 1000 }}
+                                  animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
+
+                                  className="select-none text-sm text-left">
+                                    <span className="font-bold">{flight.departure_airport}</span>
+                                    <span className="font-bold">${flight.price}</span>
+                                  </motion.p>
+                                </motion.div>
+                              ))}
+                            </motion.div>  
+                            
+                            </>
+                          )}
+                      
+                  </motion.div>
                 </div>
-
-
-                <div className="flex flex-col w-full">
-                </div>
-
+                </>
+              )}
+               
+              <div className="w-full h-full "></div>
             </div>
 
-
-            {/* <img className="w-full h-full absolute opacity-80 top-0 left-0 z-[-1]" src={staticgif.src}></img> */}
-            {/* <div className="w-full h-full absolute bg-black opacity-70 top-0 left-0 z-[-1]"></div> */}
         </div>
 
+        {/* plane */}
         <motion.div 
         initial={{ opacity: 0, x: 200 }}
         animate={{ opacity: 1, x: 0, transition: { duration: 2.5 } }}
@@ -170,22 +272,32 @@ export default function FindPage() {
             <PlaneModel />
         </motion.div>
 
-        
 
+        {text.length > 0 && (
+          <>
+        <motion.div 
+        initial={{ opacity: 0, y: -200 }}
+        animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
+        className="absolute flex place-items-center top-[10%] bg-white rounded-lg outline left-1/2 transform -translate-x-1/2 max-w-[500px] p-4 w-max h-[100px] z-[100]">
+            <p className="text-sm">{conversationText}</p>
+        </motion.div>
+          </>
+          )}
+
+        {/* button */}
         <motion.div 
         initial={{ opacity: 0, y: 200 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
-        className="select-none w-full h-max flex relative z-10 flex-col place-items-center gap-2">
+        className="select-none bg-white flex place-self-center rounded-xl w-max h-max flex absolute bottom-10 z-[1] flex-col place-items-center gap-2">
           <Card className="w-full bg-transparent border-none outline-none h-max flex flex-col place-items-center place-content-center">
-            <CardHeader>
+            <CardHeader className="text-md">
               {recording === true && <CardTitle>Recording...</CardTitle>}
-              {recording === false && <CardTitle><span className="text-orange-500 font-bold">Press Start</span></CardTitle>}
+              {recording === false && <CardTitle><span className="text-orange-500 font-bold">Press Start!</span></CardTitle>}
             </CardHeader>
             <CardContent className="flex gap-4">
-              {/* <Button onClick={() => handleClick(text)}>translate!</Button> */}
               {recording === true && (
                 <>
-                <Button className="bg-red-600 animate-pulse" onClick={startRecording}>Start!</Button>
+                <Button className="bg-red-600 animate-pulse" disabled>Recording...</Button>
                 </>
               )}
 
@@ -195,23 +307,23 @@ export default function FindPage() {
                 </>
               )}
 
-              <Button className="hover:scale-[110%]" onClick={() => {
-                stopRecording(); 
-                pythonMessage();
-              }}>Stop!</Button>
+              <Button 
+                className="hover:scale-[110%]" 
+                onClick={() => {
+                  stopRecording();
+                }}
+              >
+                Stop!
+              </Button>
 
-              {/* <Button onClick={pythonMessage}>test</Button> */}
-              {/* {audio && <audio src={audio} controls />} */}
+              {audio && <audio className="hidden" src={audio} autoPlay controls />}
             </CardContent>
-            {/* <p>debug: {text}</p> */}
           </Card>
-          {/* <p>{text}</p> */}
         </motion.div>
 
       </div>
       
     </div> 
-     
     </>
   );
 }

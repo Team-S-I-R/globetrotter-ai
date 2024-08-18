@@ -10,13 +10,19 @@ import {
     NavigationMenuTrigger,
     NavigationMenuViewport,
   } from "@/components/ui/navigation-menu"
+import { motion } from "framer-motion"
 
 export default function Header() {
     return (
     <>
-    <header className="flex justify-between p-6">
+    <motion.header 
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 2.3 }}
+    className="flex relative z-50 justify-between p-6 outline outline-[1px] w-screen">
     <a href="/" className="text-xl font-bold">Globetrotter</a>
-    <div></div>
+    <a href="/about" className="text-xl font-bold">About</a>
+    {/* <div></div> */}
     {/* <NavigationMenu>
         <NavigationMenuList>
             <NavigationMenuItem>
@@ -27,7 +33,7 @@ export default function Header() {
             </NavigationMenuItem>
         </NavigationMenuList>
     </NavigationMenu> */}
-    </header>
+    </motion.header>
     </>
     )
 }

@@ -18,7 +18,10 @@ AMADEUS_CLIENT_SECRET = "NBVGe1CHAW1tLSxK"
 
 NEW_GOOGLE_API_KEY = "AIzaSyCmIRr2omcRRr_dbASqK4KjDNdatz4zGK8"
 genai.configure(api_key=NEW_GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.0-pro')
+
+
 
 chat = model.start_chat(
     history=[]
@@ -37,7 +40,7 @@ def generate_content(prompt):
 
 @app.route('/plan_trip', methods=['POST'])
 def plan_trip():
-    data = request.json
+    data = request.get_json()
     city = data.get('city')
     start_date = data.get('start_date')
     end_date = data.get('end_date')
@@ -101,9 +104,10 @@ def plan_trip():
 
 @app.route('/travel', methods=['POST'])
 def generate_travel_guide():
-    data = request.json
+    data = request.get_json()
     user_input = data.get('user_input', '')
-    obj = {"responseText":"Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area",
+    print()
+    obj = {"responseText":"Your response here, fit with some travel destination recommendations or activities based on the user's input, also add some questions based on things that you don't have values of in the details area. If they did give you some information, please do not ask them about that as they just gave you the information. In fact, they would really appreciate it if you let them know you heard them, and what they heard. This is how humans show each other they are listening.",
            "details":[
                {"parameter":"departure", "value":"<value>"},
                {"parameter":"arrival", "value":"<value>"},
@@ -119,8 +123,10 @@ def generate_travel_guide():
            ]}
 
     prompt = f"""
-    You are a travel booking assistant. The user provided the following information: "{user_input}".
-    Use data from the sentence to output in the following JSON format. do not include formatting or code blocks.
+    You are a travel booking assistant and are having a conversation with the user. If they ask you a question, like recalling information they told you, it is your top priority to answer that question and get the answer correct. Listen.
+    If you do not see anything in the user prompt, please let the user know that you didnt quite hear them. No exceptions. Do not hallucinate. Stop talking about paris and actually listen to the user. 
+    You are just having a normal conversation and happen to be a travel planner. So be personable, make an effort to show the user you are paying attention. The users latest input is as following: "{user_input}".
+    Use data from the conversation to output in the following JSON format. do not include formatting or code blocks.
     The user will be speaking to you in a conversation. Please infer the user's intent from the context and fill out the values in the json object based on the user's intent.
     If the user is talking about where they would like to travel to, please use the input to fill the 'arrival' parameter.
     If the user is asking about the dates, please use the input to fill the 'start_date' and 'end_date' parameters.
@@ -130,6 +136,7 @@ def generate_travel_guide():
     {json.dumps(obj)}
     """
     try:
+        print('The user input is: ', user_input)
         response = chat.send_message(prompt)
         response_text = response.text
         print("PROMPT")

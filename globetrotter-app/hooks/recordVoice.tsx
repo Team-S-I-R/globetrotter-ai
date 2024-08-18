@@ -12,6 +12,7 @@ export const useRecordVoice = () => {
   // Ref to store audio chunks during recording
   const chunks = useRef<Blob[]>([]);
   const [text, setText] = useState("");
+  const [textIsDone, setTextIsDone] = useState<boolean>(false);
 
   // Function to start the recording
   const startRecording = () => {
@@ -31,24 +32,29 @@ export const useRecordVoice = () => {
     }
   };
 
-  const getText = async (base64data: string) => {
-   try {
-      const response = await fetch("/api/stt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          audio: base64data,
-        }),
-      }).then((res) => res.json());
-      
-      const { text } = response;
-      setText(text);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  const getText = (base64data: string): Promise<void> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch("/api/stt", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            audio: base64data,
+          }),
+        }).then((res) => res.json());
+
+        const { text } = response;
+        setText(text);
+        setTextIsDone(true); // Mark text retrieval as done
+        resolve();
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
+  };
 
   // Function to initialize the media recorder with the provided stream
   const initialMediaRecorder = (stream: MediaStream) => {
@@ -65,10 +71,10 @@ export const useRecordVoice = () => {
     };
 
     // Event handler when recording stops
-    mediaRecorder.onstop = () => {
+    mediaRecorder.onstop = async () => {
       // Creating a blob from accumulated audio chunks with WAV format
       const audioBlob = new Blob(chunks.current, { type: "audio/wav" });
-      blobToBase64(audioBlob, getText);
+      await blobToBase64(audioBlob, getText); // No need for await here
       console.log(audioBlob, 'audioBlob')
 
       // You can do something with the audioBlob, like sending it to a server or processing it further
@@ -85,5 +91,5 @@ export const useRecordVoice = () => {
     }
   }, []); 
 
-  return { recording, startRecording, stopRecording, text };
+  return { recording, startRecording, stopRecording, text, textIsDone, setTextIsDone };
 };
