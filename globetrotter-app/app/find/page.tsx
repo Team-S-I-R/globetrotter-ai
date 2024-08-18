@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/accordion"
 import { LightbulbIcon } from "lucide-react";
 import { X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function FindPage() {
   const [transcript, setTranscript] = useState("");
@@ -37,10 +39,10 @@ export default function FindPage() {
   //   { parameter: "Default Parameter", value: "Default Value" },
   // ]);
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([
-    { parameter: "Arriving To", value: "Los Angeles" },
-    { parameter: "Number of People", value: "2" },
-    { parameter: "Budget", value: "$500" },
-    { parameter: "Airline", value: "Delta" },
+    // { parameter: "Arriving To", value: "Los Angeles" },
+    // { parameter: "Number of People", value: "2" },
+    // { parameter: "Budget", value: "$500" },
+    // { parameter: "Airline", value: "Delta" },
   ]);
   const { toast } = useToast()
   const [scope, animate] = useAnimate();
@@ -123,7 +125,7 @@ const [showTip, setShowTip] = useState(false);
         console.log(data)
         setDebugInput(data.the_user_input);
         handleAiTalking(data.responseText);
-        // setSearchedFlights(data.searched_flights);
+        setSearchedFlights(data.searched_flights);
         setTimeout(() => {
           toast({ title: '✅ Success!', description: 'Response received...Responding to user now.', itemID: 'success' });
         }, 1000);
@@ -133,6 +135,9 @@ const [showTip, setShowTip] = useState(false);
       }
     
   }
+
+ 
+
 
 
   return (
@@ -191,11 +196,11 @@ const [showTip, setShowTip] = useState(false);
                        
               {details?.length > 0 && (
                 <>
-                <div className="w-[200px] max-w-[300px] p-2 h-max bg-white rounded-xl absolute top-[20vh] left-10">
+                <div className="w-[200px] max-w-[300px] p-2 h-max bg-white rounded-xl absolute z-[1000] top-[20vh] left-10">
                 <motion.div
                 initial={{ opacity: 0, x: -200 }}
                 animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-                className="flex place-items-center gap-4 w-full m-[1px] p-2">
+                className="flex  place-items-center gap-4 w-full m-[1px] p-2">
                   <img className="w-[20px]" src={quote.src} alt="" />
                   <p className="font-bold">Checklist!</p>
                 </motion.div>
@@ -209,7 +214,7 @@ const [showTip, setShowTip] = useState(false);
                     <motion.div 
                     initial={{ opacity: 0, x: -200 }}
                     animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-                    key={index} className="detail relative h-max select-none w-full h-max p-2 text-black">
+                    key={index} className="detail hover:bg-gray-100/50 relative h-max select-none w-full h-max p-2 text-black">
                       <motion.p  
                       initial={{ opacity: 0, x: -200 }}
                       animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
@@ -228,7 +233,7 @@ const [showTip, setShowTip] = useState(false);
               
               {searchedFlights.flights?.length > 0 && (
                 <>
-                <div className="w-[200px] max-w-[300px] p-2 h-max bg-white rounded-xl absolute top-[30vh] right-10">
+                <div className="w-[300px] max-w-[400px] p-2 h-max bg-white rounded-xl absolute z-[1000] top-[30vh] right-10">
                   <motion.div
                       initial={{ opacity: 0, x: 1000 }}
                       animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}                 
@@ -246,23 +251,37 @@ const [showTip, setShowTip] = useState(false);
                             <motion.div 
                             initial={{ opacity: 0, x: -200 }}
                             animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
-                            className="flex flex-col w-full h-full m-[1px] p-2 ">
+                            className="flex flex-col w-full h-[300px] overflow-hidden m-[1px] p-2 ">
                               {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
-                              {searchedFlights.flights.map((flight, index) => ( // {{ edit_1 }}
-                                <motion.div 
-                                initial={{ opacity: 0, x: 1000 }}
-                                animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                        
-                                key={index} className=" detail select-none w-full p-2 text-orange-400">
-                                  <motion.p 
+                              <div className="w-full h-full overflow-y-scroll no-scrollbar">
+                                {searchedFlights.flights.map((flight, index) => ( // {{ edit_1 }}
+                                  <motion.div 
                                   initial={{ opacity: 0, x: 1000 }}
-                                  animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
+                                  animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                        
+                                  key={index} className="detail hover:bg-slate-100/50 select-none w-full p-2">
+                                    <motion.p 
+                                    initial={{ opacity: 0, x: 1000 }}
+                                    animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
 
-                                  className="select-none text-sm text-left">
-                                    <span className="font-bold">{flight.departure_airport}</span>
-                                    <span className="font-bold">${flight.price}</span>
-                                  </motion.p>
-                                </motion.div>
-                              ))}
+                                    className="select-none text-sm text-left flex place-items-center justify-between">
+                                      <div className="flex flex-col gap-2">
+                                        <div className="flex gap-2 place-items-center">
+                                          <span className="font-bold">{flight.departure_airport}</span>
+                                          <span className="scale-[75%]"><ArrowRight/></span>
+                                        </div>
+                                        <div className="flex gap-2 place-items-center">
+                                          <span className="font-bold">{flight.arrival_airport}</span>
+                                          <span className="scale-[75%] text-orange-400"><ArrowLeft/></span>
+                                        </div>
+                                      </div>
+                                      <div className="flex flex-col gap-2 place-items-end">
+                                        <span className="font-bold text-muted-foreground text-sm">{new Date(flight.departure_time).toLocaleString()}</span>
+                                        <span className="font-bold text-orange-400">${flight.price}</span>
+                                      </div>
+                                    </motion.p>
+                                  </motion.div>
+                                ))}
+                              </div>
                             </motion.div>  
                             
                             </>
@@ -284,7 +303,7 @@ const [showTip, setShowTip] = useState(false);
         <motion.div 
           initial={{ opacity: 0, y: 200 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-          className="flex flex-col  absolute overflow-hidden bottom-10 left-10 z-[100] bg-white place-content-start gap-8  w-[300px] h-[250px] rounded-lg m-[1px] p-6">      
+          className="flex flex-col  absolute overflow-hidden bottom-10 left-10 z-[100] bg-white place-content-start gap-8  w-[300px] h-[350px] rounded-lg m-[1px] p-6">      
             <div onClick={() => setShowTip(false)} className="w-max bg-white h-max m-4 absolute  top-0 right-0 z-[100]">
                <X/> 
             </div>
@@ -311,7 +330,7 @@ const [showTip, setShowTip] = useState(false);
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-4">
-                <AccordionTrigger>Easter Eggs :o</AccordionTrigger>
+                <AccordionTrigger><span className="text-orange-400">Easter Eggs :o</span></AccordionTrigger>
                 <AccordionContent>
                 <li>If you are here then you found the first one! What if we told you there is one more! Have you pressed the arrow keys yet?</li>
                 </AccordionContent>
@@ -344,12 +363,12 @@ const [showTip, setShowTip] = useState(false);
         </motion.div>
 
 
-        {text?.length > 0 && (
+        {text?.length > 10 && (
           <>
         <motion.div 
         initial={{ opacity: 0, y: -200 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
-        className="absolute flex place-items-center top-[10%] bg-white rounded-lg outline left-1/2 transform -translate-x-1/2 max-w-[500px] p-4 w-max h-[100px] z-[100]">
+        className="absolute flex place-items-start  overflow-y-scroll no-scrollbar top-[10%] bg-white rounded-lg outline left-1/2 transform -translate-x-1/2 max-w-[300px] px-5 py-3 pb-4 w-max h-[100px] z-[100]">
             <p className="text-sm">{conversationText}</p>
         </motion.div>
           </>
@@ -364,24 +383,29 @@ const [showTip, setShowTip] = useState(false);
         initial={{ opacity: 0, y: 200 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
         className="select-none bg-white flex place-self-center rounded-xl w-max h-max flex absolute bottom-10 z-[1] flex-col place-items-center gap-2">
-          <Card className="w-full bg-transparent border-none outline-none h-max flex flex-col place-items-center place-content-center">
+
+          <Card className="w-full bg-transparent gap-4 border-none outline-none h-max flex flex-col place-items-center place-content-center">
             <CardHeader className="text-md">
               {recording === true && <CardTitle>Recording...</CardTitle>}
-              {recording === false && <CardTitle><span className="text-orange-500 font-bold">Press Start!</span></CardTitle>}
+              {recording === false && <CardTitle><span className="text-orange-500 font-bold">Press Talk!</span></CardTitle>}
             </CardHeader>
             <CardContent className="flex gap-4">
               {recording === true && (
                 <>
-                <Button className="bg-red-600 animate-pulse" disabled>Recording...</Button>
+                <Button className="bg-red-600 animate-pulse" disabled>Talking...</Button>
                 </>
               )}
 
               {recording === false && (
                 <>
-               <Button className="hover:scale-[110%] hover:bg-orange-500" onClick={startRecording}>Start!</Button>
+                <div className="flex flex-col gap-2">
+               <Button className="hover:scale-[110%] hover:bg-orange-500" onClick={startRecording}>Talk!</Button>
+                {/* <span className="text-xs">or "T" 2 times</span> */}
+                </div>
                 </>
               )}
 
+              <div className="flex flex-col gap-2">
               <Button 
                 className="hover:scale-[110%]" 
                 onClick={() => {
@@ -390,6 +414,8 @@ const [showTip, setShowTip] = useState(false);
               >
                 Stop!
               </Button>
+                {/* <span className="text-xs">or "S" 2 times</span> */}
+              </div>
 
               {audio && <audio className="hidden" src={audio} autoPlay controls />}
             </CardContent>
