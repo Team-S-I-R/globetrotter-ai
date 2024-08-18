@@ -5,18 +5,22 @@ import google.logging as logging
 import json
 import os
 from flask_cors import CORS
+import dotenv
 
 app = Flask(__name__)
 CORS(app)
 
-GOOGLE_API_KEY = "AIzaSyAtw3ossKpb0a9aiDnB385Xal2OJpZX0ac"
+dotenv.load()
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-AMADEUS_CLIENT_ID = "7MEvfgTSMXFdPgurtu2iscp7w2F6qBKA"
-AMADEUS_CLIENT_SECRET = "NBVGe1CHAW1tLSxK"
+AMADEUS_CLIENT_ID = os.getenv("AMADEUS_CLIENT_ID")
+AMADEUS_CLIENT_SECRET = os.getenv("AMADEUS_CLIENT_SECRET")
 
-NEW_GOOGLE_API_KEY = "AIzaSyCmIRr2omcRRr_dbASqK4KjDNdatz4zGK8"
+NEW_GOOGLE_API_KEY = os.getenv("NEW_GOOGLE_API_KEY")
 genai.configure(api_key=NEW_GOOGLE_API_KEY)
 # model = genai.GenerativeModel('gemini-1.5-flash')
 model = genai.GenerativeModel('gemini-1.0-pro')
