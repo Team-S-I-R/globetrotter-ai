@@ -104,8 +104,9 @@ const [showTip, setShowTip] = useState(false);
 
   const pythonMessage = async (message: string) => {
 
-      try {
-        const response = await fetch(`http://127.0.0.1:5000/travel`, {
+      try {        
+        const response = await fetch(`${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : 'https://vercel-globetrotters-be-deployment.vercel.app'}/travel`, {
+        // const response = await fetch(`http://127.0.0.1:5000/travel`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
