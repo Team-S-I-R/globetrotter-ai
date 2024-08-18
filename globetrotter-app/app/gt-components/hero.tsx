@@ -78,6 +78,15 @@ export default function Hero() {
         <>
         <motion.div className="flex flex-col gap-4 w-full h-full place-items-center place-content-center">
             
+            <motion.h2
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{duration: 1.5}}
+            className='bg-white p-1 px-2 rounded-lg'
+            >
+                Travel the world one conversation at a time
+            </motion.h2>
+
             <motion.h1 
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
