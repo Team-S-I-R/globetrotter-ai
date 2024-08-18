@@ -23,11 +23,13 @@ export default function FindPage() {
   const [conversationText, setConversationText] = useState("");
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([
   ]);
+  const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: []});
   const { toast } = useToast()
   const [scope, animate] = useAnimate();
+  const [debugInput, setDebugInput] = useState("");
 
   // this should make the ai talk and it should say the responsetext
-  const handleClick = async (msg: String) => {
+  const handleAiTalking = async (msg: String) => {
     try {
       const response = await fetch(`./api/tts`, {
         method: "POST",
@@ -81,10 +83,15 @@ export default function FindPage() {
 
       const data = await response.json();
 
-      console.log(data);
       setConversationText(data.responseText);
       setDetails(data.details); // Assuming the response contains a 'details' field
-      toast({ title: '✅ Success!', description: conversationText, itemID: 'success' });
+      console.log(data)
+      setDebugInput(data.the_user_input);
+      handleAiTalking(data.responseText);
+      // setSearchedFlights(data.searched_flights);
+      setTimeout(() => {
+        toast({ title: '✅ Success!', description: '', itemID: 'success' });
+      }, 1000);
     } catch (error) {
       console.log(error);
       toast({ title: '❌ Error!', description: 'There was an error processing your request. Please press the start button to start a conversation.', itemID: 'error' });
@@ -93,6 +100,12 @@ export default function FindPage() {
 
   return (
     <>
+
+    <div className="absolute z-[100] flex flex-col w-[200px] top-0 right-0">
+      <strong>audio transcript:</strong> {text}
+      <strong>ai thinks i said:</strong> {debugInput}
+    </div>
+
     <div className="absolute top-0 left-0">
         <Header/>  
     </div>
@@ -103,57 +116,79 @@ export default function FindPage() {
 
     <div className="w-screen h-screen py-[40px]">
       
-      <div className="w-full h-full flex flex-col justify-between mx-auto p-4">
+      <div className="w-full h-full  flex flex-col justify-between mx-auto p-4">
       
 
 
         {/* beautiful content will go here */}
-        <div className="w-full relative h-screen flex flex-col place-items-center place-content-start py-8">
+        <div className="w-full relative h-screen  flex flex-col place-items-center place-content-start py-8">
           
           
 
-            <div  className="w-full h-full grid gap-1 grid-cols-2 place-items-center  px-4 justify-between no-scrollbar overflow-y-scroll">
+            <div  className="w-full h-full  grid gap-1 grid-cols-2 place-items-center  px-4 justify-between no-scrollbar overflow-y-scroll">
             
                 <div className="flex flex-col w-full">
-                <motion.p 
-                initial={{ opacity: 0, x: -200 }}
-                animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}
-                className="select-none w-full">
-                  {conversationText}
-                </motion.p>
+                    
+                    <motion.p 
+                    initial={{ opacity: 0, x: -200 }}
+                    animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}
+                    className="absolute select-none w-full bottom-0">
+                      {conversationText}
+                    </motion.p>
               
-              
-              {details?.length > 0 && (
+                    {details?.length > 0 && (
+                      <>
+                      <motion.div
+                      initial={{ opacity: 0, x: -200 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+                      className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                        <img className="w-[20px]" src={quote.src} alt="" />
+                      </motion.div>
 
-                <>
-
-                <motion.div
-                initial={{ opacity: 0, x: -200 }}
-                animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-                className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
-                  <img className="w-[20px]" src={quote.src} alt="" />
-                </motion.div>
-
-
-                <motion.div 
-                initial={{ opacity: 0, x: -200 }}
-                animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
-                className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
-                  {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
-                  {details?.map((detail, index) => ( 
-                    <div key={index} className="detail select-none w-full p-2 text-black">
-                      <p className="select-none text-lg text-left"><span className="font-bold">{detail.parameter}</span>: {detail.value}</p>
-                    </div>
-                  ))}
-                </motion.div>
-                  
-                  </>
-              )}
+                      <motion.div 
+                      initial={{ opacity: 0, x: -200 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
+                      className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                        {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
+                        {details?.map((detail, index) => ( 
+                          <div key={index} className="detail select-none w-full p-2 text-black">
+                            <p className="select-none text-lg text-left"><span className="font-bold">{detail.parameter}</span>: {detail.value}</p>
+                          </div>
+                        ))}
+                      </motion.div>      
+                        </>
+                    )}
 
                 </div>
 
-
                 <div className="flex flex-col w-full">
+                    {searchedFlights.flights?.length > 0 && ( // {{ edit_1 }}
+                      <>
+                      <motion.div
+                      initial={{ opacity: 0, x: -200 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
+                      className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                        <img className="w-[20px]" src={quote.src} alt="" />
+                      </motion.div>
+
+                      <motion.div 
+                      initial={{ opacity: 0, x: -200 }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}          
+                      className="flex flex-col w-full m-[1px] p-2 outline outline-[2px]">
+                        {/* {details?.filter(detail => detail.value).slice(0, 4).map((detail, index) => ( */}
+                        {searchedFlights.flights.map((flight, index) => ( // {{ edit_1 }}
+                          <div key={index} className="detail select-none w-full p-2 text-black">
+                            <p className="select-none text-lg text-left">
+                              <span className="font-bold">{flight.departure_airport}</span>
+                              <span className="font-bold">{flight.price}</span>
+                            </p>
+                          </div>
+                        ))}
+                      </motion.div>  
+                      
+                      </>
+                    )}
+                
                 </div>
 
             </div>
@@ -168,14 +203,12 @@ export default function FindPage() {
         animate={{ opacity: 1, x: 0, transition: { duration: 2.5 } }}
         className="absolute top-0 left-0 w-full h-full z-[1]">
             <PlaneModel />
-        </motion.div>
-
-        
+        </motion.div>   
 
         <motion.div 
         initial={{ opacity: 0, y: 200 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
-        className="select-none w-full h-max flex relative z-10 flex-col place-items-center gap-2">
+        className="select-none w-full h-full flex relative z-10 flex-col place-items-center gap-2">
           <Card className="w-full bg-transparent border-none outline-none h-max flex flex-col place-items-center place-content-center">
             <CardHeader>
               {recording === true && <CardTitle>Recording...</CardTitle>}
@@ -197,11 +230,13 @@ export default function FindPage() {
 
               <Button className="hover:scale-[110%]" onClick={() => {
                 stopRecording(); 
-                pythonMessage();
+                setTimeout(() => {
+                  pythonMessage();
+                }, 1000);
               }}>Stop!</Button>
 
               {/* <Button onClick={pythonMessage}>test</Button> */}
-              {/* {audio && <audio src={audio} controls />} */}
+              {audio && <audio className="hidden" src={audio} autoPlay controls />}
             </CardContent>
             {/* <p>debug: {text}</p> */}
           </Card>
