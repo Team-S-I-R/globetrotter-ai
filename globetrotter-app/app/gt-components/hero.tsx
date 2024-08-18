@@ -112,19 +112,19 @@ export default function Hero() {
             </motion.div>
   
         <motion.div className='w-max place-items-center gap-2 flex flex-col h-max bottom-10 right-10 absolute z-[10]'>
-            <p className='scale-[250%]'>
+            <p className='scale-[250%] select-none'>
                 <p className="font-bold scale-150 animate-bounce">👀</p>
             </p>
             <div className='flex gap-2 place-items-center'>
                 <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>                
-                        <p className='cursor-pointer text-muted-foreground'>Hint</p>
+                        <span className='cursor-pointer text-muted-foreground'>Hint</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                    <p>you should try:
+                    <span>you should try:
                         teamsir
-                    </p>
+                    </span>
                     </TooltipContent>
                 </Tooltip>
                 </TooltipProvider>

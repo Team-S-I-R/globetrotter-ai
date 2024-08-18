@@ -1,12 +1,18 @@
-import Header from "../gt-components/header"
+'use client'
 
+import Header from "../gt-components/header"
+import { motion } from "framer-motion"
 export default function About() {
     return (
         <>
         <div className="absolute top-0 w-full">
         <Header/>
         </div>
-        <div className="select-none w-full p-4 text-center h-screen gap-4 flex flex-col place-items-center place-content-center">
+        <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 2.3 }}
+        className="select-none w-full p-4 text-center h-screen gap-4 flex flex-col place-items-center place-content-center">
             <h1 className="text-3xl font-bold">About Us</h1>
             <p>We are a passionate team dedicated to creating the best software solutions for all people, from students to professionals. This project started development in mid-August 2024.</p>
             <p>We're thrilled to share that we've entered this project into a hackathon with Headstarter! Wish us luck :D</p>
@@ -33,7 +39,7 @@ export default function About() {
                     </a>
                 </div>
             </div>
-        </div>
+        </motion.div>
         </>
     )
 }

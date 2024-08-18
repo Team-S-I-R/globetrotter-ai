@@ -128,7 +128,11 @@ export default function FindPage() {
   return (
     <>
     {/* mobile */}
-    <motion.div className="w-full bg-white h-full flex flex-col  absolute z-[100] sm:hidden">
+    <motion.div 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 2.5 }}
+    className="w-full bg-white h-full flex flex-col  absolute z-[100] sm:hidden">
         <Header/>
         <div className="w-2/3 p-2 rounded-lg bg-white text-center absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           <p className="">Hi!, Thanks for your interest in <strong>Globetrotter!</strong></p>

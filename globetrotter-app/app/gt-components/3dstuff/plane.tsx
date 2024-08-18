@@ -2,7 +2,7 @@
 
 import { Circle, Html, OrbitControls, Stats, useProgress, PresentationControls } from '@react-three/drei';
 import { Canvas, useLoader } from '@react-three/fiber';
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import plane from '../../assets/source/plane.glb';
 import { useAnimations } from '@react-three/drei';
@@ -17,6 +17,7 @@ const Plane: React.FC = () => {
   const gltf = useLoader(GLTFLoader, plane);
   const { actions, names } = useAnimations(gltf.animations, gltf.scene);
   const meshRef = useRef<THREE.Object3D>(null); // reference for the mesh
+  const [position, setPosition] = useState([0, 0.5, 0.3]); // Initial position of the plane
 
   useEffect(() => {
     if (actions && names.length) {
@@ -29,12 +30,54 @@ const Plane: React.FC = () => {
     }
   }, [actions, names]);
 
+  const keysPressed = useRef(new Set());
+  const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      keysPressed.current.add(event.key);
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      keysPressed.current.delete(event.key);
+    };
+
+    const updatePosition = () => {
+      const moveSpeed = 0.1;
+      const newPosition = [...position];
+
+      if (keysPressed.current.has('ArrowUp')) {
+        newPosition[2] = Math.min(lerp(newPosition[2], newPosition[2] + moveSpeed, 0.1), 1); // Limit to 1
+      }
+      if (keysPressed.current.has('ArrowDown')) {
+        newPosition[2] = Math.max(lerp(newPosition[2], newPosition[2] - moveSpeed, 0.1), -1); // Limit to -1
+      }
+      if (keysPressed.current.has('ArrowLeft')) {
+        newPosition[0] = Math.max(lerp(newPosition[0], newPosition[0] - moveSpeed, 0.1), -1); // Limit to -1
+      }
+      if (keysPressed.current.has('ArrowRight')) {
+        newPosition[0] = Math.min(lerp(newPosition[0], newPosition[0] + moveSpeed, 0.1), 1); // Limit to 1
+      }
+
+      setPosition(newPosition);
+      requestAnimationFrame(updatePosition);
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    requestAnimationFrame(updatePosition);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [position]);
 
   return (
     <primitive
     ref={meshRef}
     object={gltf.scene}
-    position={[0, 0.5, 0.3]}
+    position={position}
     scale={[0.005, 0.005, 0.005]}
     castShadow
 
