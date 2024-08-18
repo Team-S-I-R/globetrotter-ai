@@ -112,9 +112,9 @@ export default function Hero() {
             </motion.div>
   
         <motion.div className='w-max place-items-center gap-2 flex flex-col h-max bottom-10 right-10 absolute z-[10]'>
-            <p className='scale-[250%] select-none'>
+            <div className='scale-[250%] select-none'>
                 <p className="font-bold scale-150 animate-bounce">👀</p>
-            </p>
+            </div>
             <div className='flex gap-2 place-items-center'>
                 <TooltipProvider>
                 <Tooltip>
