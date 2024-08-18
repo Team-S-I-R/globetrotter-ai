@@ -38,10 +38,10 @@ export default function FindPage() {
   const [scope, animate] = useAnimate();
   const [debugInput, setDebugInput] = useState("");
   const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [
-    {id: 1, departure: "New York", arrival: "Los Angeles", date: "2023-03-01", price: 200}, 
-    {id: 2, departure: "Chicago", arrival: "San Francisco", date: "2023-03-05", price: 250},
-    {id: 3, departure: "Boston", arrival: "Las Vegas", date: "2023-03-05", price: 550},
-    {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
+    // {id: 1, departure: "New York", arrival: "Los Angeles", date: "2023-03-01", price: 200}, 
+    // {id: 2, departure: "Chicago", arrival: "San Francisco", date: "2023-03-05", price: 250},
+    // {id: 3, departure: "Boston", arrival: "Las Vegas", date: "2023-03-05", price: 550},
+    // {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
   ]});
   const [startGame, setStartGame] = useState(false);
   // const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [

@@ -9,6 +9,12 @@ import ParticleRing from './3dparticles'
 import EarthModel from './3dstuff/earth'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 
 export default function Hero() {
 
@@ -106,8 +112,24 @@ export default function Hero() {
             </motion.div>
   
         <motion.div className='w-max place-items-center gap-2 flex flex-col h-max bottom-10 right-10 absolute z-[10]'>
-            <p className="font-bold scale-150">👀</p>
-            <Input name='Password' onChange={handleInput} placeholder='Enter Password' className='w-[200px] h-max p-2'></Input>
+            <p className='scale-[250%]'>
+                <p className="font-bold scale-150 animate-bounce">👀</p>
+            </p>
+            <div className='flex gap-2 place-items-center'>
+                <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>                
+                        <p className='cursor-pointer text-muted-foreground'>Hint</p>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                    <p>you should try:
+                        teamsir
+                    </p>
+                    </TooltipContent>
+                </Tooltip>
+                </TooltipProvider>
+                <Input name='Password' onChange={handleInput} placeholder='Enter Password' className='w-[200px] h-max p-2'></Input>
+            </div>
         </motion.div>
   
         </motion.div>
