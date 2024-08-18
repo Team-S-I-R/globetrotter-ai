@@ -9,7 +9,7 @@ import dotenv
 import datetime
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:3000", "https://globetrotter-app.vercel.app"])
 
 dotenv.load_dotenv()
 
