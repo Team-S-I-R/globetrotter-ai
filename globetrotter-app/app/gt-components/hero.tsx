@@ -82,7 +82,7 @@ export default function Hero() {
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 1.5}}
-            className='bg-white p-1 px-2 rounded-lg'
+            className='w-full mx-3 sm:mx-0 text-center bg-white p-1 px-2 rounded-lg'
             >
                 Travel the world one conversation at a time
             </motion.h2>
@@ -91,7 +91,7 @@ export default function Hero() {
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             transition={{duration: 1.5}}
-            className="text-6xl uppercase font-bold select-none">Globetrotter AI</motion.h1>
+            className="text-3xl sm:text-6xl uppercase font-bold select-none">Globetrotter AI</motion.h1>
             
             <motion.div className="w-1/2  flex flex-col gap-2 place-items-center">
                 <motion.form 
