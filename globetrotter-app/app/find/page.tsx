@@ -326,8 +326,8 @@ const [showTip, setShowTip] = useState(false);
              onClick={() => setShowTip(true)}
              initial={{ opacity: 0, x: -200 }}
              animate={{ opacity: 1, x: 0, transition: { duration: 1.5, staggerChildren: 0.2 } }}                    
-             className="flex hover:scale-[110%] cursor-pointer flex-col place-items-center place-content-center absolute overflow-hidden bottom-10 left-10 z-[100] bg-white   w-[30px] h-[30px] rounded-full m-[1px] p-6">      
-                <span className="text-3xl hover:text-orange-400 "><LightbulbIcon/></span> 
+             className="flex hover:scale-[110%] hover:text-orange-400 cursor-pointer flex-col place-items-center place-content-center absolute overflow-hidden bottom-10 left-10 z-[100] bg-white   w-[30px] h-[30px] rounded-full m-[1px] p-6">      
+                <span className="text-3xl  "><LightbulbIcon/></span> 
            </motion.div> 
           )}
 
