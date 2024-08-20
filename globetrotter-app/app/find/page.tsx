@@ -61,6 +61,18 @@ export default function FindPage() {
   //   {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
   // ]});
 // 
+const navigateToPlanTrip = () => {
+  fetch('http://127.0.0.1:5000/plan_trip')
+    .then(response => response.json())  // Parse the JSON from the response
+    .then(data => {
+      console.log(data);  // Log the JSON data to the console
+      // window.location.href = 'http://127.0.0.1:5000/some_other_route';
+    })
+    .catch(error => {
+      console.error('Error fetching the plan trip data:', error);
+    });
+};
+
 const [showTip, setShowTip] = useState(false);
 
   // this should make the ai talk and it should say the responsetext
@@ -112,7 +124,7 @@ const [showTip, setShowTip] = useState(false);
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": "*",
           },
           body: JSON.stringify({
             user_input: message
@@ -415,6 +427,7 @@ const [showTip, setShowTip] = useState(false);
               >
                 Stop!
               </Button>
+              <Button onClick={navigateToPlanTrip}>Plan</Button>
                 {/* <span className="text-xs">or "S" 2 times</span> */}
               </div>
 

@@ -72,24 +72,14 @@ def generate_content(prompt):
 
 @app.route('/plan_trip', methods=['POST'])
 def plan_trip():
-    data = request.get_json()
-    city = data.get('city')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    budget = data.get('budget')
-    max_distance = data.get('max_distance')
-    user_comments = data.get('comments', '')  
-
     prompt = f"""
-    You are a travel assistant. Generate a comprehensive travel plan for a trip to {city} from {start_date} to {end_date}.
-    The trip has a budget of {budget}, and the user wants to explore within {max_distance} km from {city}.
+    You are a travel assistant. Generate a comprehensive travel plan for a trip to a city.
+    The user wants to explore around the city/place they described in the history of the chat, make the itenirary based on that, thank you! 
     Include the following:
 
     1. **Detailed Itinerary**: Provide a detailed daily itinerary with suggested activities and destinations.
     2. **Packing List**: Suggest a packing list for the trip, taking into account the weather and local activities.
-    3. **Cultural Information**: Include key cultural practices, local cuisine, and must-see attractions in {city}.
-
-    Additional comments from the user: "{user_comments}"
+    3. **Cultural Information**: Include key cultural practices, local cuisine, and must-see attractions.
 
     Format the response as JSON with fields for 'itinerary', 'packing_list', and 'cultural_info', such as in the following:
         {{
@@ -121,7 +111,7 @@ def plan_trip():
     "additional_comments": "Remember to check for any local events or festivals happening during your visit. Enjoy your trip!"
     }}
     """
-    response_text = generate_content(prompt)
+    response_text = chat.send_message(prompt)
     
     if response_text:
         try:
@@ -154,20 +144,22 @@ def generate_travel_guide():
            ]}
 
     prompt = f"""
-    Your name is Globetrotter Ai. If you introduce yourself to the user, use your name which is Globetrotter Ai. You are a travel booking assistant and are having a conversation with the user.YOUR GOAL IS TO SEARCH FOR FLIGHTS AND PROVIDE THEM TO THE USER.
-    ONCE YOU HAVE ENOUGH INFORMATION YOU NEED TO START GIVING THE USER THE FLIGHT INFORMATION. IF YOU FOR SOME REASON ARE NOT ABLE TO, COMMUNICATE AND TRY AGAIN.
-    EVERYTHING, THIS CONVERSATION IS SO THAT YOU CAN PROVIDE FLIGHTS BASED ON THE USER'S INFORMATION.  If they ask you a question, like recalling information they told you, it is your top priority to answer that question and get the answer correct. Listen.
-    If you do not see anything in the user prompt, please let the user know that you didnt quite hear them. No exceptions. Do not hallucinate. Stop talking about paris and actually listen to the user. 
-    You are just having a normal conversation and happen to be a travel planner. So be personable, make an effort to show the user you are paying attention. The users latest input is as following: "{user_input}".
-    Use data from the conversation to output in the following JSON format. do not include formatting or code blocks.
-    The user will be speaking to you in a conversation. Please infer the user's intent from the context and fill out the values in the json object based on the user's intent.
-    If the user is talking about where they would like to travel to, please use the input to fill the 'arrival' parameter.
-    If the user is asking about the dates, please use the input to fill the 'start_date' and 'end_date' parameters.
-    If the user is asking about the number of people traveling, please use the input to fill the 'numAdults', 'numChildren', and 'numInfants' parameters.
-    Also, as you are having the conversation, If you update a value in the json object, please remember these values. Add them to your memory and send them
-    every time you send a response along with the new values you discover in the conversation.
+    Your name is Globetrotter AI, and you are a travel booking assistant. When introducing yourself, please use your name, Globetrotter AI. You’re in a conversation with the user, with the primary goal of searching for flights and travel advising and providing them with relevant options. 
+    Once you have gathered enough information, present the flight details to the user. If you're unable to do so, communicate the issue and attempt to resolve it. This entire conversation is centered on assisting the user in finding flights based on their provided details. If the user asks a question or requests information they’ve previously shared, prioritize responding accurately. Actively listen and ensure your responses are based on the user’s input.
+    If the user's input isn't clear, please kindly ask them to clarify. Avoid making assumptions or providing irrelevant information, please focus on the user's needs. You are simply having a normal, friendly conversation while serving as a travel planner. Show the user that you are attentive and engaged.
+
+    The user's latest input is: "{user_input}". 
+
+    Use the data from this conversation to put in the following JSON format without additional formatting or code blocks. Infer the user's intent and update the corresponding values in the JSON object based on the conversation.
+
+    If the user mentions a destination, update the 'arrival' parameter.
+    If the user discusses travel dates, update the 'start_date' and 'end_date' parameters.
+    If the user talks about the number of travelers, update the 'numAdults', 'numChildren', and 'numInfants' parameters.
+
+    As you get information, remember to store and include these values in every response along with any new details you find in the conversation.
     {json.dumps(obj)}
     """
+
     try:
         response = chat.send_message(prompt)
         response_text = response.text
