@@ -9,7 +9,7 @@ import dotenv
 import datetime
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000", "https://globetrotter-app.vercel.app"])
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 dotenv.load_dotenv()
 
@@ -23,10 +23,7 @@ AMADEUS_CLIENT_SECRET = os.getenv("AMADEUS_CLIENT_SECRET")
 
 NEW_GOOGLE_API_KEY = os.getenv("NEW_GOOGLE_API_KEY")
 genai.configure(api_key=NEW_GOOGLE_API_KEY)
-# model = genai.GenerativeModel('gemini-1.5-flash')
 model = genai.GenerativeModel('gemini-1.0-pro')
-
-
 
 chat = model.start_chat(
     history=[]
@@ -40,22 +37,20 @@ def format_date(date_str):
         if formatted:
             return formatted.strip() 
         else:
-            raise ValueError("gemini returned an empty response.")
+            raise ValueError("Gemini returned an empty response.")
 
     except Exception as e:
-        print("error formatting date: {e}")
+        print(f"Error formatting date: {e}")
         return None
-
-
 
 def get_airport_code(city):
     prompt = f"""
     You are a travel assistant. Provide the IATA airport code for the closest airport to {city} in one word. For example, if I put Los Angeles, you should simply provide 'LAX'.
     """
     response_text = generate_content(prompt)
-    print(f"Generated content for airport code: {response_text}")  # Debug print
+    print(f"Generated content for airport code: {response_text}")  
     if response_text:
-        return response_text.strip()  # Clean up any extraneous whitespace
+        return response_text.strip()  
     else:
         print("Error: No response text received")
         return None
@@ -63,18 +58,20 @@ def get_airport_code(city):
 def generate_content(prompt):
     try:
         response = chat.send_message(prompt)
-        response_text = response.text
-        clean_response_text = response_text.replace("```json\n", "").replace("\n```", "")
+        response_text = response.text  
+        print(f"Type of response.text: {type(response_text)}")
+        print(f"Representation of response.text: {repr(response_text)}")
+        clean_response_text = str(response_text).replace("<code>json\n", "").replace("\n</code>", "")
         return clean_response_text
     except Exception as e:
         print(f"Error generating content: {e}")
         return None
 
-@app.route('/plan_trip', methods=['POST'])
+@app.route('/plan_trip', methods=['GET'])
 def plan_trip():
     prompt = f"""
-    You are a travel assistant. Generate a comprehensive travel plan for a trip to a city.
-    The user wants to explore around the city/place they described in the history of the chat, make the itenirary based on that, thank you! 
+    You are a travel assistant. Generate a comprehensive travel plan for a trip to a city. It doesn't matter how much information you are provided, but you just need to return the information.
+    The user wants to explore around the city/place they described in the history of the chat, make the itinerary based on that, thank you! 
     Include the following:
 
     1. **Detailed Itinerary**: Provide a detailed daily itinerary with suggested activities and destinations.
@@ -111,16 +108,23 @@ def plan_trip():
     "additional_comments": "Remember to check for any local events or festivals happening during your visit. Enjoy your trip!"
     }}
     """
-    response_text = chat.send_message(prompt)
-    
-    if response_text:
-        try:
-            response_json = json.loads(response_text)
-        except json.JSONDecodeError as e:
-            print(f"Error parsing response JSON: {e}")
-            response_json = {'error': 'Error parsing response from Gemini'}
-    else:
-        response_json = {'error': 'Error generating content from Gemini'}
+    try:
+        response = chat.send_message(prompt)
+        response_text = response.text  
+
+        print(f"Type of response.text: {type(response_text)}")
+        print(f"Representation of response.text: {repr(response_text)}")
+
+        clean_response_text = str(response_text).replace("<code>json\n", "").replace("\n</code>", "")
+
+        response_json = json.loads(clean_response_text)
+
+    except json.JSONDecodeError as e:
+        print(f"error parsing response json: {e}")
+        response_json = {'error': 'error parsing response from Gemini plan'}
+    except Exception as e:
+        print(f"error generating content: {e}")
+        response_json = {'error': 'error generating content'}
 
     return jsonify(response_json)
 

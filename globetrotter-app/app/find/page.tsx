@@ -61,21 +61,24 @@ export default function FindPage() {
   //   {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
   // ]});
 // 
+
 const navigateToPlanTrip = () => {
   fetch('http://127.0.0.1:5000/plan_trip')
-    .then(response => response.json())  // Parse the JSON from the response
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
-      console.log(data);  // Log the JSON data to the console
-      // window.location.href = 'http://127.0.0.1:5000/some_other_route';
+      console.log(data); 
     })
     .catch(error => {
       console.error('Error fetching the plan trip data:', error);
     });
 };
-
 const [showTip, setShowTip] = useState(false);
 
-  // this should make the ai talk and it should say the responsetext
   const handleAiTalking = async (msg: String) => {
     try {
       const response = await fetch(`./api/tts`, {
@@ -427,8 +430,18 @@ const [showTip, setShowTip] = useState(false);
               >
                 Stop!
               </Button>
-              <Button onClick={navigateToPlanTrip}>Plan</Button>
-                {/* <span className="text-xs">or "S" 2 times</span> */}
+              <motion.div 
+                initial={{ opacity: 0, x: -200 }}
+                animate={{ opacity: 1, x: 0, transition: { duration: 1.5 } }}              
+                className="flex justify-center mt-4"
+              >
+                <Button 
+                  onClick={navigateToPlanTrip} 
+                  className="bg-black text-white px-4 py-2 rounded"
+                >
+                  Plan Trip
+                </Button>
+              </motion.div>
               </div>
 
               {audio && <audio className="hidden" src={audio} autoPlay controls />}
