@@ -1,6 +1,6 @@
 # Globetrotter App
 
-Welcome to the Globetrotter App! This is a Next.js Voice AI Assitant project designed to provide a seamless experience for travelers. 
+Welcome to the Globetrotter App! This is a Next.js Voice AI Assitant project designed to provide a seamless experience for travelers. Deployed on the [Vercel for it.](https://globetrotter-app.vercel.app/)
 
 ## Table of Contents
 - [Getting Started](#getting-started)
@@ -55,10 +55,7 @@ To get started with the project, follow these steps:
 - **Flask**
 - **React 3 Fiber**
 - **Flask**
-  
-## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com). Follow the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## Contributing
 
