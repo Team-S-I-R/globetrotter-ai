@@ -39,19 +39,25 @@ export default function FindPage() {
   //   { parameter: "Default Parameter", value: "Default Value" },
   // ]);
   const [details, setDetails] = useState<Array<{parameter: string; value: string}>>([
-    // { parameter: "Arriving To", value: "Los Angeles" },
-    // { parameter: "Number of People", value: "2" },
-    // { parameter: "Budget", value: "$500" },
-    // { parameter: "Airline", value: "Delta" },
+    { parameter: "Arriving To", value: "Los Angeles" },
+    { parameter: "Number of People", value: "2" },
+    { parameter: "Budget", value: "$500" },
+    { parameter: "Airline", value: "Delta" },
   ]);
   const { toast } = useToast()
   const [scope, animate] = useAnimate();
   const [debugInput, setDebugInput] = useState("");
   const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [
-    // {id: 1, departure: "New York", arrival: "Los Angeles", date: "2023-03-01", price: 200}, 
-    // {id: 2, departure: "Chicago", arrival: "San Francisco", date: "2023-03-05", price: 250},
-    // {id: 3, departure: "Boston", arrival: "Las Vegas", date: "2023-03-05", price: 550},
-    // {id: 4, departure: "Seattle", arrival: "Miami", date: "2023-03-05", price: 1050},
+    // {id: 1, departure_airport: "NYC", arrival_airport: "LAX", departure_time: "March 1, 2023", price: 200, flight_number: "A1", airline: "American"}, 
+    // {id: 2, departure_airport: "CHI", arrival_airport: "SFO", departure_time: "March 5, 2023", price: 250, flight_number: "U2", airline: "United"},
+    // {id: 3, departure_airport: "BOS", arrival_airport: "LAS", departure_time: "March 5, 2023", price: 550, flight_number: "D0", airline: "Delta"},
+    // {id: 4, departure_airport: "SEA", arrival_airport: "MIA", departure_time: "March 5, 2023", price: 1050, flight_number: "A4", airline: "Alaska"},
+    // {id: 5, departure_airport: "SJC", arrival_airport: "ATL", departure_time: "September 6, 2023", price: 450, flight_number: "S0", airline: "Southwest"},
+    // {id: 6, departure_airport: "IAH", arrival_airport: "DEN", departure_time: "April 10, 2023", price: 300, flight_number: "F6", airline: "Frontier"},
+    // {id: 7, departure_airport: "PHX", arrival_airport: "DFW", departure_time: "May 15, 2023", price: 350, flight_number: "W7", airline: "Southwest"},
+    // {id: 8, departure_airport: "PHL", arrival_airport: "MCO", departure_time: "June 20, 2023", price: 400, flight_number: "N0", airline: "Spirit"},
+    // {id: 9, departure_airport: "SAN", arrival_airport: "JFK", departure_time: "July 25, 2023", price: 500, flight_number: "B0", airline: "JetBlue"},
+    // {id: 10, departure_airport: "AUS", arrival_airport: "ORD", departure_time: "August 30, 2023", price: 600, flight_number: "A9", airline: "American"},
   ]});
   const [startGame, setStartGame] = useState(false);
   // const [searchedFlights, setSearchedFlights] = useState<{flights: Array<any>}>({flights: [
@@ -62,6 +68,11 @@ export default function FindPage() {
   // ]});
 // 
 const [showTip, setShowTip] = useState(false);
+const [debugText, setDebugText] = useState(`
+  I need a 1-way direct flight from San Jose California to Atlanta Georgia 
+  on september the 6th that arrives by or before 3:00 p.m. SInce 
+  this is a one way there is no end date, my budget is $500 and i will be the 
+  only one traveling. please give me some options`);
 
   // this should make the ai talk and it should say the responsetext
   const handleAiTalking = async (msg: String) => {
@@ -77,16 +88,23 @@ const [showTip, setShowTip] = useState(false);
       }).then((res) => res.json());
 
       setAudio(`data:audio/mp3;base64,${response.audio}`);
+
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    if (text?.length > 1) {
-      toast({ title: 'Sending your message off!', description: '', itemID: 'success' });
-      setTimeout(() => pythonMessage(text), 1000);
-    }
+    const handleTextChange = async () => {
+      if (text?.length > 1) {
+        toast({ title: 'Sending your message off!', description: '', itemID: 'success' });
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // pythonMessage(text).then(() => 
+        pythonMessage(text).then(() => 
+            toast({ title: '✅ Success!', description: 'Response received...Responding to user now.', itemID: 'success' }));
+      }
+    };
+    handleTextChange();
   }, [text]);
 
   // const fetchTravelData = async () => {
@@ -121,15 +139,11 @@ const [showTip, setShowTip] = useState(false);
 
         const data = await response.json();
 
-        setConversationText(data.responseText);
-        setDetails(data.details); // Assuming the response contains a 'details' field
-        console.log(data)
-        setDebugInput(data.the_user_input);
         handleAiTalking(data.responseText);
+        setConversationText(data.responseText);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setDetails(data.details); // Assuming the response contains a 'details' field
         setSearchedFlights(data.searched_flights);
-        setTimeout(() => {
-          toast({ title: '✅ Success!', description: 'Response received...Responding to user now.', itemID: 'success' });
-        }, 1000);
       } catch (error) {
         console.log(error);
         toast({ title: '❌ Error!', description: 'There was an error processing your request. Please press the start button to start a conversation.', itemID: 'error' });
@@ -218,7 +232,7 @@ const [showTip, setShowTip] = useState(false);
                     key={index} className="detail hover:bg-gray-100/50 relative h-max select-none w-full h-max p-2 text-black">
                       <motion.p  
                       initial={{ opacity: 0, x: -200 }}
-                      animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
+                      animate={{ opacity: 1, x: 0, transition: { duration: 0.1 + index } }}
                       className="select-none text-sm text-left"><span className="font-bold">{detail.parameter}</span>: {detail.value}</motion.p>
                       {/* <img className=" top-0 w-[100px] h-[100px]" src={singlecloud.src} alt="" /> */}
                     </motion.div>
@@ -265,20 +279,34 @@ const [showTip, setShowTip] = useState(false);
                                     animate={{ opacity: 1, x: 0, transition: { duration: 0.3 + index } }}
 
                                     className="select-none text-sm text-left flex place-items-center justify-between">
-                                      <div className="flex flex-col gap-2">
-                                        <div className="flex gap-2 place-items-center">
+                                      <span className="flex flex-col gap-2">
+                                        
+                                        {/* departure */}
+                                        <span className="flex gap-2 place-items-center">
                                           <span className="font-bold">{flight.departure_airport}</span>
                                           <span className="scale-[75%]"><ArrowRight/></span>
-                                        </div>
-                                        <div className="flex gap-2 place-items-center">
+                                        </span>
+
+                                        {/* arrival */}
+                                        <span className="flex gap-2 place-items-center">
                                           <span className="font-bold">{flight.arrival_airport}</span>
                                           <span className="scale-[75%] text-orange-400"><ArrowLeft/></span>
-                                        </div>
-                                      </div>
-                                      <div className="flex flex-col gap-2 place-items-end">
-                                        <span className="font-bold text-muted-foreground text-sm">{new Date(flight.departure_time).toLocaleString()}</span>
+                                        </span>
+
+                                      </span>
+
+                                      <span className="flex flex-col gap-2">
+                                        <span>{flight.flight_number}</span>
+                                        <span>{flight.airline}</span>
+                                      </span>
+
+                                      {/* price and dates */}
+                                      <span className="flex flex-col gap-2 place-items-end">
+                                        <span className="font-bold text-muted-foreground ">{new Date(flight.departure_time).toLocaleDateString()}</span>
                                         <span className="font-bold text-orange-400">${flight.price}</span>
-                                      </div>
+                                      </span>
+
+
                                     </motion.p>
                                   </motion.div>
                                 ))}
@@ -369,8 +397,8 @@ const [showTip, setShowTip] = useState(false);
         <motion.div 
         initial={{ opacity: 0, y: -200 }}
         animate={{ opacity: 1, y: 0, transition: { duration: 1.5 } }}
-        className="absolute flex place-items-start  overflow-y-scroll no-scrollbar top-[10%] bg-white rounded-lg outline left-1/2 transform -translate-x-1/2 max-w-[300px] px-5 py-3 pb-4 w-max h-[100px] z-[100]">
-            <p className="text-sm">{conversationText}</p>
+        className="absolute flex place-items-start place-content-center text-center  overflow-y-scroll no-scrollbar top-[10%] bg-white rounded-lg outline left-1/2 transform -translate-x-1/2 w-[300px] px-5 py-3 pb-4  h-[100px] z-[100]">
+            <p className="text-sm">{conversationText || "Thinking...."}</p>
         </motion.div>
           </>
           )}

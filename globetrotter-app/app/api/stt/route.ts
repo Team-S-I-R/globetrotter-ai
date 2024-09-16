@@ -18,6 +18,12 @@ const client = new SpeechClient({
   },
 });
 
+const config: protos.google.cloud.speech.v1.IRecognitionConfig = {
+  encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+  sampleRateHertz: 48000,
+  languageCode: "en-US",
+};
+
 export async function POST(req: any) {
   const body = await req.json();
   const base64Audio = body.audio;
@@ -31,12 +37,6 @@ export async function POST(req: any) {
 
   const aud = {
     content: audioBuffer.toString("base64"),
-  };
-
-  const config: protos.google.cloud.speech.v1.IRecognitionConfig = {
-    encoding: protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding.WEBM_OPUS,
-    sampleRateHertz: 48000,
-    languageCode: "en-US",
   };
 
   const request: protos.google.cloud.speech.v1.IRecognizeRequest = {
@@ -67,3 +67,13 @@ export async function POST(req: any) {
     return NextResponse.json({ error: "Failed to transcribe audio" }, { status: 400 });
   }
 }
+
+
+// if (response.results && response.results.length > 0) {
+//   transcription = response.results.reduce((acc, result) => {
+//     if (result.alternatives && result.alternatives.length > 0) {
+//       acc += result.alternatives[0].transcript + "\n";
+//     }
+//     return acc;
+//   }, "");
+// }
